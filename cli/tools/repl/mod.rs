@@ -242,7 +242,7 @@ pub async fn run(
   // Doing this manually, instead of using `log::info!` because these messages
   // are supposed to go to stdout, not stderr.
   if !cli_options.is_quiet() {
-    println!("Deno {}", crate::version::deno());
+    println!("Deno for UIX {}", crate::version::deno());
     println!("exit using ctrl+d, ctrl+c, or close()");
     if repl_flags.is_default_command {
       println!(

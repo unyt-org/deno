@@ -43,6 +43,7 @@ use std::path::Path;
 use tower_lsp::lsp_types as lsp;
 use tower_lsp::lsp_types::Position;
 use tower_lsp::lsp_types::Range;
+use deno_lint::diagnostic::LintDiagnosticSeverity;
 
 /// Diagnostic error codes which actually are the same, and so when grouping
 /// fixes we treat them the same.
@@ -103,6 +104,7 @@ pub enum Category {
     code: String,
     hint: Option<String>,
     quick_fixes: Vec<DataQuickFix>,
+    severity: Option<LintDiagnosticSeverity>,
   },
 }
 
@@ -120,10 +122,17 @@ impl Reference {
         message,
         code,
         hint,
+        severity,
         quick_fixes,
       } => lsp::Diagnostic {
         range: self.range,
-        severity: Some(lsp::DiagnosticSeverity::WARNING),
+        severity: Some(match severity {
+          Some(LintDiagnosticSeverity::ERROR) => lsp::DiagnosticSeverity::ERROR,
+          Some(LintDiagnosticSeverity::WARNING) => lsp::DiagnosticSeverity::WARNING,
+          Some(LintDiagnosticSeverity::INFORMATION) => lsp::DiagnosticSeverity::INFORMATION,
+          Some(LintDiagnosticSeverity::HINT) => lsp::DiagnosticSeverity::HINT,
+          _ => lsp::DiagnosticSeverity::WARNING
+        }),
         code: Some(lsp::NumberOrString::String(code.to_string())),
         code_description: None,
         source: Some(DiagnosticSource::Lint.as_lsp_source().to_string()),
@@ -188,6 +197,7 @@ pub fn get_lint_references(
             message: d.details.message,
             code: d.details.code.to_string(),
             hint: d.details.hint,
+            severity: d.details.severity,
             quick_fixes: d
               .details
               .fixes
@@ -1198,6 +1208,7 @@ mod tests {
             message: "message1".to_string(),
             code: "code1".to_string(),
             hint: None,
+            severity: None,
             quick_fixes: Vec::new(),
           },
           range,
@@ -1217,6 +1228,7 @@ mod tests {
             message: "message2".to_string(),
             code: "code2".to_string(),
             hint: Some("hint2".to_string()),
+            severity: None,
             quick_fixes: Vec::new(),
           },
           range,
