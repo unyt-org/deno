@@ -24,6 +24,10 @@ use deno_core::serde::Serialize;
 use deno_core::serde_json;
 use deno_core::serde_json::json;
 use deno_core::ModuleSpecifier;
+use deno_lint::diagnostic::LintDiagnostic;
+use deno_lint::diagnostic::LintDiagnosticSeverity;
+use deno_lint::rules::LintRule;
+use deno_runtime::deno_node::NpmResolver;
 use deno_runtime::deno_node::PathClean;
 use deno_semver::jsr::JsrPackageNvReference;
 use deno_semver::jsr::JsrPackageReqReference;
@@ -44,7 +48,6 @@ use std::path::Path;
 use tower_lsp::lsp_types as lsp;
 use tower_lsp::lsp_types::Position;
 use tower_lsp::lsp_types::Range;
-use deno_lint::diagnostic::LintDiagnosticSeverity;
 
 /// Diagnostic error codes which actually are the same, and so when grouping
 /// fixes we treat them the same.
@@ -129,10 +132,14 @@ impl Reference {
         range: self.range,
         severity: Some(match severity {
           Some(LintDiagnosticSeverity::ERROR) => lsp::DiagnosticSeverity::ERROR,
-          Some(LintDiagnosticSeverity::WARNING) => lsp::DiagnosticSeverity::WARNING,
-          Some(LintDiagnosticSeverity::INFORMATION) => lsp::DiagnosticSeverity::INFORMATION,
+          Some(LintDiagnosticSeverity::WARNING) => {
+            lsp::DiagnosticSeverity::WARNING
+          }
+          Some(LintDiagnosticSeverity::INFORMATION) => {
+            lsp::DiagnosticSeverity::INFORMATION
+          }
           Some(LintDiagnosticSeverity::HINT) => lsp::DiagnosticSeverity::HINT,
-          _ => lsp::DiagnosticSeverity::WARNING
+          _ => lsp::DiagnosticSeverity::WARNING,
         }),
         code: Some(lsp::NumberOrString::String(code.to_string())),
         code_description: None,
