@@ -41,7 +41,7 @@ exclude = ["tests/util/std/hash/_wasm"]
 authors = ["the Deno authors"]
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/denoland/deno"
+repository = "https://github.com/unyt-org/deno"
 
 [workspace.dependencies]
 deno_ast = { version = "=0.42.0", features = ["transpiling"] }
@@ -402,3 +402,5 @@ opt-level = 3
 [patch.crates-io]
 deno_ast = { git = "https://github.com/unyt-org/deno_ast.git" }
 deno_lint = { git = "https://github.com/unyt-org/deno_lint.git" }
+# deno_ast = { path = "../deno_ast" }
+# deno_lint = { path = "../deno_lint" }
