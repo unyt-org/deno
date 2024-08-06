@@ -1673,7 +1673,7 @@ dependencies = [
 [[package]]
 name = "deno_lint"
 version = "0.62.0"
-source = "git+https://github.com/unyt-org/deno_lint.git#5515e237dbf52c6bf5d39fdb5160632428781b61"
+source = "git+https://github.com/unyt-org/deno_lint.git#044e28309f66ab82a007e0d85e663cf8bf3d72a9"
 dependencies = [
  "anyhow",
  "deno_ast",
