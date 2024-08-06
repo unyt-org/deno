@@ -10,6 +10,8 @@ use super::urls::url_to_uri;
 
 use crate::args::jsr_url;
 use crate::tools::lint::CliLinter;
+use deno_ast::diagnostics::Diagnostic;
+use deno_ast::diagnostics::DiagnosticLevel;
 use deno_lint::diagnostic::LintDiagnosticRange;
 
 use deno_ast::SourceRange;
@@ -23,10 +25,6 @@ use deno_core::serde::Serialize;
 use deno_core::serde_json;
 use deno_core::serde_json::json;
 use deno_core::ModuleSpecifier;
-use deno_lint::diagnostic::LintDiagnostic;
-use deno_lint::diagnostic::LintDiagnosticSeverity;
-use deno_lint::rules::LintRule;
-use deno_runtime::deno_node::NpmResolver;
 use deno_runtime::deno_node::PathClean;
 use deno_runtime::fs_util::specifier_to_file_path;
 use deno_semver::jsr::JsrPackageNvReference;
@@ -38,6 +36,7 @@ use deno_semver::package::PackageReq;
 use deno_semver::package::PackageReqReference;
 use deno_semver::Version;
 use import_map::ImportMap;
+use lsp_types::DiagnosticSeverity;
 use node_resolver::NpmResolver;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -108,7 +107,7 @@ pub enum Category {
     code: String,
     hint: Option<String>,
     quick_fixes: Vec<DataQuickFix>,
-    severity: Option<LintDiagnosticSeverity>,
+    severity: Option<DiagnosticSeverity>,
   },
 }
 
@@ -130,17 +129,7 @@ impl Reference {
         quick_fixes,
       } => lsp::Diagnostic {
         range: self.range,
-        severity: Some(match severity {
-          Some(LintDiagnosticSeverity::ERROR) => lsp::DiagnosticSeverity::ERROR,
-          Some(LintDiagnosticSeverity::WARNING) => {
-            lsp::DiagnosticSeverity::WARNING
-          }
-          Some(LintDiagnosticSeverity::INFORMATION) => {
-            lsp::DiagnosticSeverity::INFORMATION
-          }
-          Some(LintDiagnosticSeverity::HINT) => lsp::DiagnosticSeverity::HINT,
-          _ => lsp::DiagnosticSeverity::WARNING,
-        }),
+        severity: *severity,
         code: Some(lsp::NumberOrString::String(code.to_string())),
         code_description: None,
         source: Some(DiagnosticSource::Lint.as_lsp_source().to_string()),
@@ -202,10 +191,13 @@ pub fn get_lint_references(
         Some(Reference {
           range: as_lsp_range_from_lint_diagnostic(range),
           category: Category::Lint {
-            message: d.details.message,
-            code: d.details.code.to_string(),
-            hint: d.details.hint,
-            severity: d.details.severity,
+            message: d.clone().details.message,
+            code: d.clone().details.code.to_string(),
+            hint: d.clone().details.hint,
+            severity: match d.clone().level() {
+              DiagnosticLevel::Error => Some(DiagnosticSeverity::ERROR),
+              DiagnosticLevel::Warning => Some(DiagnosticSeverity::WARNING),
+            },
             quick_fixes: d
               .details
               .fixes
