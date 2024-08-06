@@ -196,7 +196,7 @@ pub fn get_lint_references(
             severity: match d.details.severity {
               Some(DiagnosticLevel::Error) => Some(DiagnosticSeverity::ERROR),
               Some(DiagnosticLevel::Warning) => Some(DiagnosticSeverity::WARNING),
-              _ => None,
+              _ => Some(DiagnosticSeverity::WARNING),
             },
             quick_fixes: d
               .details
@@ -1220,7 +1220,7 @@ mod tests {
             message: "message1".to_string(),
             code: "code1".to_string(),
             hint: None,
-            severity: None,
+            severity: Some(lsp::DiagnosticSeverity::WARNING),
             quick_fixes: Vec::new(),
           },
           range,
@@ -1240,7 +1240,7 @@ mod tests {
             message: "message2".to_string(),
             code: "code2".to_string(),
             hint: Some("hint2".to_string()),
-            severity: None,
+            severity: Some(lsp::DiagnosticSeverity::WARNING),
             quick_fixes: Vec::new(),
           },
           range,
