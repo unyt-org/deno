@@ -1233,7 +1233,7 @@ dependencies = [
 [[package]]
 name = "deno_ast"
 version = "0.41.2"
-source = "git+https://github.com/unyt-org/deno_ast.git#74be8a0835af9ad58ab1cac453a37a0ea41d6551"
+source = "git+https://github.com/unyt-org/deno_ast.git#d6a7d69315e46bcc0fe2c864060625c1cb5cea63"
 dependencies = [
  "anyhow",
  "base64 0.21.7",
@@ -1673,7 +1673,7 @@ dependencies = [
 [[package]]
 name = "deno_lint"
 version = "0.62.0"
-source = "git+https://github.com/unyt-org/deno_lint.git#0ae403bcdfd2695e5a3c6313fd4f30c535b24c74"
+source = "git+https://github.com/unyt-org/deno_lint.git#5515e237dbf52c6bf5d39fdb5160632428781b61"
 dependencies = [
  "anyhow",
  "deno_ast",
@@ -7019,15 +7019,15 @@ dependencies = [
 
 [[package]]
 name = "tempfile"
-version = "3.11.0"
+version = "3.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8fcd239983515c23a32fb82099f97d0b11b8c72f654ed659363a95c3dad7a53"
+checksum = "04cbcdd0c794ebb0d4cf35e88edd2f7d2c4c3e9a5a6dab322839b321c6a87a64"
 dependencies = [
  "cfg-if",
  "fastrand",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
