@@ -9,7 +9,6 @@ use super::tsc;
 
 use crate::args::jsr_url;
 use crate::tools::lint::CliLinter;
-use deno_ast::diagnostics::Diagnostic;
 use deno_ast::diagnostics::DiagnosticLevel;
 use deno_lint::diagnostic::LintDiagnosticRange;
 use deno_runtime::fs_util::specifier_to_file_path;
@@ -193,9 +192,10 @@ pub fn get_lint_references(
             message: d.clone().details.message,
             code: d.clone().details.code.to_string(),
             hint: d.clone().details.hint,
-            severity: match d.clone().level() {
-              DiagnosticLevel::Error => Some(DiagnosticSeverity::ERROR),
-              DiagnosticLevel::Warning => Some(DiagnosticSeverity::WARNING),
+            severity: match d.details.severity {
+              Some(DiagnosticLevel::Error) => Some(DiagnosticSeverity::ERROR),
+              Some(DiagnosticLevel::Warning) => Some(DiagnosticSeverity::WARNING),
+              _ => None,
             },
             quick_fixes: d
               .details
