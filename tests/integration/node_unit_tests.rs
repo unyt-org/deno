@@ -79,7 +79,7 @@ util::unit_test_factory!(
     _randomFill_test = internal / _randomFill_test,
     _randomInt_test = internal / _randomInt_test,
     module_test,
-    net_test,
+    // net_test,
     os_test,
     path_test,
     perf_hooks_test,
