@@ -1233,6 +1233,7 @@ dependencies = [
 [[package]]
 name = "deno_ast"
 version = "0.41.2"
+source = "git+https://github.com/unyt-org/deno_ast.git#d6a7d69315e46bcc0fe2c864060625c1cb5cea63"
 dependencies = [
  "anyhow",
  "base64 0.21.7",
@@ -1672,6 +1673,7 @@ dependencies = [
 [[package]]
 name = "deno_lint"
 version = "0.62.0"
+source = "git+https://github.com/unyt-org/deno_lint.git#555e702a6d4830f2b5c77cdb47c838f7fb4577e9"
 dependencies = [
  "anyhow",
  "deno_ast",
