@@ -56,7 +56,7 @@ util::unit_test_factory!(
     message_channel_test,
     mkdir_test,
     navigator_test,
-    // net_test,
+    net_test,
     network_interfaces_test,
     os_test,
     ops_test,
