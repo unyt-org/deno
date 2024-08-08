@@ -82,7 +82,7 @@ async function forwardReleaseCommitToMain() {
     $.log(`Opened PR at ${openedPr.data.url}`);
   } catch (err) {
     $.logError(
-      `Failed to open PR. Please open one manually: https://github.com/denoland/deno/pull/new/${newBranchName}`,
+      `Failed to open PR. Please open one manually: https://github.com/unyt-org/deno/pull/new/${newBranchName}`,
       err,
     );
   }
