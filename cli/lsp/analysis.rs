@@ -194,7 +194,9 @@ pub fn get_lint_references(
             hint: d.clone().details.hint,
             severity: match d.details.severity {
               Some(DiagnosticLevel::Error) => Some(DiagnosticSeverity::ERROR),
-              Some(DiagnosticLevel::Warning) => Some(DiagnosticSeverity::WARNING),
+              Some(DiagnosticLevel::Warning) => {
+                Some(DiagnosticSeverity::WARNING)
+              }
               _ => Some(DiagnosticSeverity::WARNING),
             },
             quick_fixes: d
