@@ -400,5 +400,5 @@ opt-level = 3
 opt-level = 3
 
 [patch.crates-io]
-deno_ast = { git = "https://github.com/unyt-org/deno_ast.git" }
+deno_ast = { git = "https://github.com/unyt-org/deno_ast.git", branch = "v0.41.2" }
 deno_lint = { git = "https://github.com/unyt-org/deno_lint.git" }
