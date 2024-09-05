@@ -2,10 +2,11 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 import { stringify } from "jsr:@std/yaml@^0.221/stringify";
 
+console.log(1)
 // Bump this number when you want to purge the cache.
 // Note: the tools/release/01_bump_crate_versions.ts script will update this version
 // automatically via regex, so ensure that this line maintains this format.
-const cacheVersion = 14;
+const cacheVersion = 15;
 
 const ubuntuX86Runner = "ubuntu-22.04";
 const ubuntuX86XlRunner = "ubuntu-22.04-xl";
@@ -364,80 +365,75 @@ const ci = {
       },
       strategy: {
         matrix: {
-          include: handleMatrixItems([
-            //   {
-            //   ...Runners.macosX86,
-            //   job: "test",
-            //   profile: "debug",
-            // }, {
-            //   ...Runners.macosX86,
-            //   job: "test",
-            //   profile: "release",
-            //   skip_pr: true,
-            // }, {
-            //   ...Runners.macosArm,
-            //   job: "test",
-            //   profile: "debug",
-            // }, {
-            //   ...Runners.macosArm,
-            //   job: "test",
-            //   profile: "release",
-            //   skip_pr: true,
-            // }, {
-            //   ...Runners.windowsX86,
-            //   job: "test",
-            //   profile: "debug",
-            // }, {
-            //   ...Runners.windowsX86Xl,
-            //   job: "test",
-            //   profile: "release",
-            //   skip_pr: true,
-            // }, {
-            //   ...Runners.linuxX86Xl,
-            //   job: "test",
-            //   profile: "release",
-            //   use_sysroot: true,
-            //   // TODO(ry): Because CI is so slow on for OSX and Windows, we
-            //   // currently run the Web Platform tests only on Linux.
-            //   wpt: "${{ !startsWith(github.ref, 'refs/tags/') }}",
-            // }, {
-            //   ...Runners.linuxX86Xl,
-            //   job: "bench",
-            //   profile: "release",
-            //   use_sysroot: true,
-            //   skip_pr:
-            //     "${{ !contains(github.event.pull_request.labels.*.name, 'ci-bench') }}",
-            // },
-            {
-              ...Runners.linuxX86,
-              job: "test",
-              profile: "debug",
-              use_sysroot: true,
-            },
-            {
-              ...Runners.linuxX86,
-              job: "lint",
-              profile: "debug",
-            },
-            // {
-            //   ...Runners.linuxArm,
-            //   job: "test",
-            //   profile: "debug",
-            // }, {
-            //   ...Runners.linuxArm,
-            //   job: "test",
-            //   profile: "release",
-            //   use_sysroot: true,
-            // }, {
-            //   ...Runners.macosX86,
-            //   job: "lint",
-            //   profile: "debug",
-            // }, {
-            //   ...Runners.windowsX86,
-            //   job: "lint",
-            //   profile: "debug",
-            // }
-          ]),
+          include: handleMatrixItems([{
+            ...Runners.macosX86,
+            job: "test",
+            profile: "debug",
+          }, {
+            ...Runners.macosX86,
+            job: "test",
+            profile: "release",
+            skip_pr: true,
+          }, {
+            ...Runners.macosArm,
+            job: "test",
+            profile: "debug",
+          }, {
+            ...Runners.macosArm,
+            job: "test",
+            profile: "release",
+            skip_pr: true,
+          }, {
+            ...Runners.windowsX86,
+            job: "test",
+            profile: "debug",
+          }, {
+            ...Runners.windowsX86Xl,
+            job: "test",
+            profile: "release",
+            skip_pr: true,
+          }, {
+            ...Runners.linuxX86Xl,
+            job: "test",
+            profile: "release",
+            use_sysroot: true,
+            // TODO(ry): Because CI is so slow on for OSX and Windows, we
+            // currently run the Web Platform tests only on Linux.
+            wpt: "${{ !startsWith(github.ref, 'refs/tags/') }}",
+          }, {
+            ...Runners.linuxX86Xl,
+            job: "bench",
+            profile: "release",
+            use_sysroot: true,
+            skip_pr:
+              "${{ !contains(github.event.pull_request.labels.*.name, 'ci-bench') }}",
+          }, {
+            ...Runners.linuxX86,
+            job: "test",
+            profile: "debug",
+            use_sysroot: true,
+          }, {
+            ...Runners.linuxX86,
+            job: "lint",
+            profile: "debug",
+          }, {
+            ...Runners.linuxArm,
+            job: "test",
+            profile: "debug",
+          }, {
+            ...Runners.linuxArm,
+            job: "test",
+            profile: "release",
+            use_sysroot: true,
+          }, {
+            ...Runners.macosX86,
+            job: "lint",
+            profile: "debug",
+          }, {
+            ...Runners.windowsX86,
+            job: "lint",
+            profile: "debug",
+          }]),
         },
         // Always run main branch builds to completion. This allows the cache to
         // stay mostly up-to-date in situations where a single job fails due to
