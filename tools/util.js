@@ -11,7 +11,7 @@ export { delay } from "@std/async/delay";
 
 // [toolName] --version output
 const versions = {
-  "dlint": "dlint 0.60.0",
+  // "dlint": "dlint 0.60.0",
 };
 
 const compressed = new Set(["ld64.lld", "rcodesign"]);
@@ -162,7 +162,8 @@ export async function getPrebuilt(toolName) {
     if (!versionOk) {
       throw new Error("Version mismatch");
     }
-  } catch {
+  } catch (e) {
+    console.error(e);
     await downloadPrebuilt(toolName);
   }
 

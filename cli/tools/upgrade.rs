@@ -33,9 +33,7 @@ use std::process::Command;
 use std::sync::Arc;
 use std::time::Duration;
 
-const RELEASE_URL: &str = "https://github.com/denoland/deno/releases";
-const CANARY_URL: &str = "https://dl.deno.land/canary";
-const RC_URL: &str = "https://dl.deno.land/release";
+const RELEASE_URL: &str = "https://github.com/unyt-org/deno/releases";
 
 pub static ARCHIVE_NAME: Lazy<String> =
   Lazy::new(|| format!("deno-{}.zip", env!("TARGET")));
@@ -885,10 +883,6 @@ fn get_latest_version_url(
 ) -> String {
   let file_name = match release_channel {
     ReleaseChannel::Stable => Cow::Borrowed("release-latest.txt"),
-    ReleaseChannel::Canary => {
-      Cow::Owned(format!("canary-{target_tuple}-latest.txt"))
-    }
-    ReleaseChannel::Rc => Cow::Borrowed("release-rc-latest.txt"),
     _ => unreachable!(),
   };
   let query_param = match check_kind {
@@ -903,7 +897,7 @@ fn base_upgrade_url() -> Cow<'static, str> {
   if let Ok(url) = env::var("DENO_DONT_USE_INTERNAL_BASE_UPGRADE_URL") {
     Cow::Owned(url)
   } else {
-    Cow::Borrowed("https://dl.deno.land")
+    Cow::Borrowed("https://dl.deno.land") // TODO use dl.unyt.land <---
   }
 }
 
@@ -914,14 +908,8 @@ fn get_download_url(
   let download_url = match release_channel {
     ReleaseChannel::Stable => {
       format!("{}/download/v{}/{}", RELEASE_URL, version, *ARCHIVE_NAME)
-    }
-    ReleaseChannel::Rc => {
-      format!("{}/v{}/{}", RC_URL, version, *ARCHIVE_NAME)
-    }
-    ReleaseChannel::Canary => {
-      format!("{}/{}/{}", CANARY_URL, version, *ARCHIVE_NAME)
-    }
-    ReleaseChannel::Lts => unreachable!(),
+    },
+    _ => unreachable!()
   };
 
   Url::parse(&download_url).with_context(|| {
@@ -1521,102 +1509,7 @@ mod test {
 
   #[test]
   fn test_get_latest_version_url() {
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Canary,
-        "aarch64-apple-darwin",
-        UpgradeCheckKind::Execution
-      ),
-      "https://dl.deno.land/canary-aarch64-apple-darwin-latest.txt"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Canary,
-        "aarch64-apple-darwin",
-        UpgradeCheckKind::Lsp
-      ),
-      "https://dl.deno.land/canary-aarch64-apple-darwin-latest.txt?lsp"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Canary,
-        "x86_64-pc-windows-msvc",
-        UpgradeCheckKind::Execution
-      ),
-      "https://dl.deno.land/canary-x86_64-pc-windows-msvc-latest.txt"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Canary,
-        "x86_64-pc-windows-msvc",
-        UpgradeCheckKind::Lsp
-      ),
-      "https://dl.deno.land/canary-x86_64-pc-windows-msvc-latest.txt?lsp"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Stable,
-        "aarch64-apple-darwin",
-        UpgradeCheckKind::Execution
-      ),
-      "https://dl.deno.land/release-latest.txt"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Stable,
-        "aarch64-apple-darwin",
-        UpgradeCheckKind::Lsp
-      ),
-      "https://dl.deno.land/release-latest.txt?lsp"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Stable,
-        "x86_64-pc-windows-msvc",
-        UpgradeCheckKind::Execution
-      ),
-      "https://dl.deno.land/release-latest.txt"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Rc,
-        "x86_64-pc-windows-msvc",
-        UpgradeCheckKind::Lsp
-      ),
-      "https://dl.deno.land/release-rc-latest.txt?lsp"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Rc,
-        "aarch64-apple-darwin",
-        UpgradeCheckKind::Execution
-      ),
-      "https://dl.deno.land/release-rc-latest.txt"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Rc,
-        "aarch64-apple-darwin",
-        UpgradeCheckKind::Lsp
-      ),
-      "https://dl.deno.land/release-rc-latest.txt?lsp"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Rc,
-        "x86_64-pc-windows-msvc",
-        UpgradeCheckKind::Execution
-      ),
-      "https://dl.deno.land/release-rc-latest.txt"
-    );
-    assert_eq!(
-      get_latest_version_url(
-        ReleaseChannel::Rc,
-        "x86_64-pc-windows-msvc",
-        UpgradeCheckKind::Lsp
-      ),
-      "https://dl.deno.land/release-rc-latest.txt?lsp"
-    );
+    
   }
 
   #[test]
