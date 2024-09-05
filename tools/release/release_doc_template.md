@@ -71,7 +71,7 @@ verify on GitHub that everything looks correct.
 ### Phase 1: Bumping versions
 
 - [ ] Go to the "version_bump" workflow in the CLI repo's actions:
-      https://github.com/denoland/deno/actions/workflows/version_bump.yml
+      https://github.com/unyt-org/deno/actions/workflows/version_bump.yml
   1. Click on the "Run workflow" button.
   1. In the drop down, select the minor branch (`v$MINOR_VERSION`) if doing a
      patch release or the main branch if doing a minor release.
