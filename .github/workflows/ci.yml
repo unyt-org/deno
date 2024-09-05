@@ -46,7 +46,7 @@ jobs:
     name: '${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}'
     needs:
       - pre_build
-    if: '${{ needs.pre_build.outputs.skip_build != ''true'' }}'
+    # if: '${{ needs.pre_build.outputs.skip_build != ''true'' }}'
     runs-on: '${{ matrix.runner }}'
     timeout-minutes: 180
     defaults:
@@ -65,7 +65,7 @@ jobs:
             runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''macos-13'' }}'
             job: test
             profile: release
-            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
+            # skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
           - os: macos
             arch: aarch64
             runner: macos-14
