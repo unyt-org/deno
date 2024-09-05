@@ -73,7 +73,7 @@ jobs:
             profile: debug
           - os: macos
             arch: aarch64
-            runner: self-hosted, macOS
+            runner: self-hosted
             job: test
             profile: release
             # skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
