@@ -489,6 +489,38 @@ const ci = {
           ...submoduleStep("./cli/bench/testdata/lsp_benchdata"),
           if: "matrix.job == 'bench'",
         },
+        /** temp */
+        {
+          name: "TEMP",
+          if: [
+            "matrix.os == 'linux' &&",
+            "matrix.profile == 'release' &&",
+            "matrix.job == 'build' &&",
+            "github.repository == 'unyt-org/deno' &&",
+            "startsWith(github.ref, 'refs/tags/')",
+          ].join("\n"),
+          run: [
+            "mkdir -p target/debug",
+            "echo unyt > target/debug/test.txt",
+          ].join("\n"),
+        },
+        {
+          name: "TEMP: Upload PR artifact (GitHub)",
+          if: [
+            "matrix.job == 'build' &&",
+            "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
+            "(github.repository == 'unyt-org/deno' &&",
+            "(github.ref == 'refs/heads/main' ||",
+            "startsWith(github.ref, 'refs/tags/'))))",
+          ].join("\n"),
+          uses: "actions/upload-artifact@v4",
+          with: {
+            name:
+              "deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}",
+            path: "target/${{ matrix.profile }}/test.txt",
+          },
+        },
+        /** */
         {
           name: "Create source tarballs (release, linux)",
           if: [
