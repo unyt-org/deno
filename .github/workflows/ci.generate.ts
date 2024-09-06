@@ -370,7 +370,7 @@ const ci = {
     },
     build: {
       name:
-        "${{ matrix.profile }}: ${{ matrix.job }} (${{ matrix.os }}-${{ matrix.arch }}) | ${{ (!matrix.skip && active) }}",
+        "${{ matrix.profile }}: ${{ matrix.job }} (${{ matrix.os }}-${{ matrix.arch }}) | ${{ (!matrix.skip && \"active\") }}",
       needs: ["pre_build"],
       if: "${{ needs.pre_build.outputs.skip_build != 'true' }}",
       "runs-on": "${{ matrix.runner }}",
