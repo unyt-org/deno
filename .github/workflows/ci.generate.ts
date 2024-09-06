@@ -259,7 +259,8 @@ function removeSurroundingExpression(text: string) {
 
 function handleMatrixItems(items: {
   skip_pr?: string | true;
-  skip?: string | boolean;
+  skip?: string;
+  disabled?: boolean,
   os: "linux" | "macos" | "windows";
   arch: "x86_64" | "aarch64";
   runner: string;
@@ -314,7 +315,12 @@ function handleMatrixItems(items: {
       // job
       (item.job === "lint" && settings.disableLint) ||
       (item.job === "bench" && settings.disableBench)
-    ) item.skip = true;
+    ) item.disabled = true;
+
+    console.log(
+      item.runner,
+      (item.os === "linux" && item.arch === "aarch64" && settings.disableLinuxArm)
+    )
 
     return { ...item };
   });
@@ -370,9 +376,9 @@ const ci = {
     },
     build: {
       name:
-        "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}${{ ((matrix.skip) && ' | disabled') || '' }}",
+        "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}${{ ((matrix.disabled) && ' | disabled') || '' }}",
       needs: ["pre_build"],
-      if: "${{ needs.pre_build.outputs.skip_build != 'true' }}",
+      if: "${{ needs.pre_build.outputs.skip_build != 'true' && !matrix.disabled }}",
       "runs-on": "${{ matrix.runner }}",
       "timeout-minutes": 150,
       defaults: {
