@@ -378,9 +378,9 @@ const ci = {
       name:
         "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}${{ ((matrix.disabled) && ' | disabled') || '' }}",
       needs: ["pre_build"],
-      if: "!(matrix.disabled)",
+      if: "${{ needs.pre_build.outputs.skip_build != 'true' }}",
       "runs-on": "${{ matrix.runner }}",
-      "timeout-minutes": 150,
+      "timeout-minutes": "${{ (matrix.disabled && 0) || 150 }}",
       defaults: {
         run: {
           // GH actions does not fail fast by default on
