@@ -71,7 +71,7 @@ verify on GitHub that everything looks correct.
 ### Phase 1: Bumping versions
 
 - [ ] Go to the "version_bump" workflow in the CLI repo's actions:
-      https://github.com/denoland/deno/actions/workflows/version_bump.yml
+      https://github.com/unyt-org/deno/actions/workflows/version_bump.yml
   1. Click on the "Run workflow" button.
   1. In the drop down, select the minor branch (`v$MINOR_VERSION`) if doing a
      patch release or the main branch if doing a minor release.
@@ -96,7 +96,7 @@ verify on GitHub that everything looks correct.
 ### Phase 2: Publish
 
 - [ ] Go to the "cargo_publish" workflow in the CLI repo's actions:
-      https://github.com/denoland/deno/actions/workflows/cargo_publish.yml
+      https://github.com/unyt-org/deno/actions/workflows/cargo_publish.yml
   1. Run it on the same branch that you used before and wait for it to complete.
 
   <details>
@@ -117,7 +117,7 @@ verify on GitHub that everything looks correct.
       GitHub draft release.
 
   The CI pipeline will create a release draft on GitHub
-  (https://github.com/denoland/deno/releases).
+  (https://github.com/unyt-org/deno/releases).
 
 - ⛔ Verify that:
   - [ ] There are 14 assets on the release draft.

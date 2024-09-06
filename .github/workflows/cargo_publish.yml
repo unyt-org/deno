@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   build:
     name: cargo publish
-    runs-on: ubuntu-20.04-xl
+    runs-on: ubuntu-20.04
     timeout-minutes: 90
 
     env:
