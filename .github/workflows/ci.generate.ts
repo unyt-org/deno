@@ -370,7 +370,7 @@ const ci = {
     },
     build: {
       name:
-        "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }} | ${{ ((matrix.skip) && 'canceled') || '' }}",
+        "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}${{ ((matrix.skip) && ' | disabled') || '' }}",
       needs: ["pre_build"],
       if: "${{ needs.pre_build.outputs.skip_build != 'true' }}",
       "runs-on": "${{ matrix.runner }}",
@@ -386,34 +386,34 @@ const ci = {
         matrix: {
           include: handleMatrixItems([{
             ...Runners.macosX86,
-            job: "test",
+            job: "build",
             profile: "debug",
           }, {
             ...Runners.macosX86,
-            job: "test",
+            job: "build",
             profile: "release",
             skip_pr: true,
           }, {
             ...Runners.macosArm,
-            job: "test",
+            job: "build",
             profile: "debug",
           }, {
             ...Runners.macosArm,
-            job: "test",
+            job: "build",
             profile: "release",
             skip_pr: true,
           }, {
             ...Runners.windowsX86,
-            job: "test",
+            job: "build",
             profile: "debug",
           }, {
             ...Runners.windowsX86,
-            job: "test",
+            job: "build",
             profile: "release",
             skip_pr: true,
           }, {
             ...Runners.linuxX86,
-            job: "test",
+            job: "build",
             profile: "release",
             use_sysroot: true,
             // TODO(ry): Because CI is so slow on for OSX and Windows, we
@@ -428,7 +428,7 @@ const ci = {
               "${{ !contains(github.event.pull_request.labels.*.name, 'ci-bench') }}",
           }, {
             ...Runners.linuxX86,
-            job: "test",
+            job: "build",
             profile: "debug",
             use_sysroot: true,
           }, {
@@ -437,11 +437,11 @@ const ci = {
             profile: "debug",
           }, {
             ...Runners.linuxArm,
-            job: "test",
+            job: "build",
             profile: "debug",
           }, {
             ...Runners.linuxArm,
-            job: "test",
+            job: "build",
             profile: "release",
             use_sysroot: true,
           }, {
