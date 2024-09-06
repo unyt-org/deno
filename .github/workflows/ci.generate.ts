@@ -223,7 +223,7 @@ function skipJobsIfPrAndMarkedSkip(
   return steps.map((s) =>
     withCondition(
       s,
-      "!(matrix.skip) && !(matrix.disabled)",
+      "!(matrix.skip)",
     )
   );
 }
@@ -317,13 +317,8 @@ function handleMatrixItems(items: {
       (item.job === "bench" && settings.disableBench)
     ) item.disabled = true;
 
-    console.log(
-      item.runner,
-      (item.os === "linux" && item.arch === "aarch64" && settings.disableLinuxArm)
-    )
-
     return { ...item };
-  });
+  }).filter(e => !e.disabled);
 }
 
 const ci = {
@@ -376,11 +371,11 @@ const ci = {
     },
     build: {
       name:
-        "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}${{ ((matrix.disabled) && ' | disabled') || '' }}",
+        "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}",
       needs: ["pre_build"],
       if: "${{ needs.pre_build.outputs.skip_build != 'true' }}",
       "runs-on": "${{ matrix.runner }}",
-      "timeout-minutes": "${{ (matrix.disabled && 0) || 150 }}",
+      "timeout-minutes": 150,
       defaults: {
         run: {
           // GH actions does not fail fast by default on
