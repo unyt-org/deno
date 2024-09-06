@@ -531,7 +531,8 @@ const ci = {
             "startsWith(github.ref, 'refs/tags/'))))",
           ].join("\n"),
           run: [
-            "echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'"
+            "echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'",
+            "echo ${{ github.event.pull_request.title }}"
           ].join("\n")
         },
         /** */
