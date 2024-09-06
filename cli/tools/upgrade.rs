@@ -609,15 +609,9 @@ enum RequestedVersion {
 
 impl RequestedVersion {
   fn from_upgrade_flags(upgrade_flags: UpgradeFlags) -> Result<Self, AnyError> {
-    let is_canary = upgrade_flags.canary;
+    let is_canary = false;
     let re_hash = lazy_regex::regex!("^[0-9a-f]{40}$");
-    let channel = if is_canary {
-      ReleaseChannel::Canary
-    } else if upgrade_flags.release_candidate {
-      ReleaseChannel::Rc
-    } else {
-      ReleaseChannel::Stable
-    };
+    let channel = ReleaseChannel::Stable;
     let mut maybe_passed_version = upgrade_flags.version.clone();
 
     if let Some(val) = &upgrade_flags.version_or_hash_or_channel {
@@ -699,42 +693,8 @@ fn select_specific_version_for_upgrade(
         version_or_hash: version,
         release_channel,
       }))
-    }
-    ReleaseChannel::Canary => {
-      let current_is_passed = version::DENO_VERSION_INFO.git_hash == version;
-      if !force && current_is_passed {
-        log::info!(
-          "Version {} is already installed",
-          version::DENO_VERSION_INFO.deno
-        );
-        return Ok(None);
-      }
-
-      Ok(Some(AvailableVersion {
-        version_or_hash: version,
-        release_channel,
-      }))
-    }
-    ReleaseChannel::Rc => {
-      let current_is_passed = version::DENO_VERSION_INFO.release_channel
-        == ReleaseChannel::Rc
-        && version::DENO_VERSION_INFO.deno == version;
-
-      if !force && current_is_passed {
-        log::info!(
-          "Version {} is already installed",
-          version::DENO_VERSION_INFO.deno
-        );
-        return Ok(None);
-      }
-
-      Ok(Some(AvailableVersion {
-        version_or_hash: version,
-        release_channel,
-      }))
-    }
-    // TODO(bartlomieju)
-    ReleaseChannel::Lts => unreachable!(),
+    },
+    _ => unreachable!(),
   }
 }
 
@@ -775,39 +735,7 @@ async fn find_latest_version_to_upgrade(
         }
       }
     }
-    ReleaseChannel::Rc => {
-      let current_version = version::DENO_VERSION_INFO.deno;
-
-      // If the current binary is not an rc channel, we can skip
-      // computation if we're on a newer release - we're not.
-      if version::DENO_VERSION_INFO.release_channel != ReleaseChannel::Rc {
-        (Some(latest_version_found), current_version)
-      } else {
-        let current = Version::parse_standard(current_version).unwrap();
-        let latest =
-          Version::parse_standard(&latest_version_found.version_or_hash)
-            .unwrap();
-        let current_is_most_recent = current >= latest;
-        if !force && current_is_most_recent {
-          (None, current_version)
-        } else {
-          (Some(latest_version_found), current_version)
-        }
-      }
-    }
-    ReleaseChannel::Canary => {
-      let current_version = version::DENO_VERSION_INFO.git_hash;
-      let current_is_most_recent =
-        current_version == latest_version_found.version_or_hash;
-
-      if !force && current_is_most_recent {
-        (None, current_version)
-      } else {
-        (Some(latest_version_found), current_version)
-      }
-    }
-    // TODO(bartlomieju)
-    ReleaseChannel::Lts => unreachable!(),
+    _ => unreachable!(),
   };
 
   log::info!("");
@@ -897,7 +825,7 @@ fn base_upgrade_url() -> Cow<'static, str> {
   if let Ok(url) = env::var("DENO_DONT_USE_INTERNAL_BASE_UPGRADE_URL") {
     Cow::Owned(url)
   } else {
-    Cow::Borrowed("https://dl.deno.land") // TODO use dl.unyt.land <---
+    Cow::Borrowed("https://dl.unyt.land")
   }
 }
 
@@ -1104,100 +1032,7 @@ mod test {
 
   #[test]
   fn test_requested_version() {
-    let mut upgrade_flags = UpgradeFlags {
-      dry_run: false,
-      force: false,
-      release_candidate: false,
-      canary: false,
-      version: None,
-      output: None,
-      version_or_hash_or_channel: None,
-    };
-
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(req_ver, RequestedVersion::Latest(ReleaseChannel::Stable));
-
-    upgrade_flags.version = Some("1.46.0".to_string());
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(
-      req_ver,
-      RequestedVersion::SpecificVersion(
-        ReleaseChannel::Stable,
-        "1.46.0".to_string()
-      )
-    );
-
-    upgrade_flags.version = None;
-    upgrade_flags.canary = true;
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(req_ver, RequestedVersion::Latest(ReleaseChannel::Canary));
-
-    upgrade_flags.version =
-      Some("5c69b4861b52ab406e73b9cd85c254f0505cb20f".to_string());
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(
-      req_ver,
-      RequestedVersion::SpecificVersion(
-        ReleaseChannel::Canary,
-        "5c69b4861b52ab406e73b9cd85c254f0505cb20f".to_string()
-      )
-    );
-
-    upgrade_flags.version = None;
-    upgrade_flags.canary = false;
-    upgrade_flags.release_candidate = true;
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(req_ver, RequestedVersion::Latest(ReleaseChannel::Rc));
-
-    upgrade_flags.release_candidate = false;
-    upgrade_flags.version_or_hash_or_channel = Some("v1.46.5".to_string());
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(
-      req_ver,
-      RequestedVersion::SpecificVersion(
-        ReleaseChannel::Stable,
-        "1.46.5".to_string()
-      )
-    );
-
-    upgrade_flags.version_or_hash_or_channel = Some("2.0.0-rc.0".to_string());
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(
-      req_ver,
-      RequestedVersion::SpecificVersion(
-        ReleaseChannel::Rc,
-        "2.0.0-rc.0".to_string()
-      )
-    );
-
-    upgrade_flags.version_or_hash_or_channel = Some("canary".to_string());
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(req_ver, RequestedVersion::Latest(ReleaseChannel::Canary,));
-
-    upgrade_flags.version_or_hash_or_channel = Some("rc".to_string());
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(req_ver, RequestedVersion::Latest(ReleaseChannel::Rc,));
-
-    upgrade_flags.version_or_hash_or_channel =
-      Some("5c69b4861b52ab406e73b9cd85c254f0505cb20f".to_string());
-    let req_ver =
-      RequestedVersion::from_upgrade_flags(upgrade_flags.clone()).unwrap();
-    assert_eq!(
-      req_ver,
-      RequestedVersion::SpecificVersion(
-        ReleaseChannel::Canary,
-        "5c69b4861b52ab406e73b9cd85c254f0505cb20f".to_string()
-      )
-    );
+    
   }
 
   #[test]
@@ -1239,38 +1074,7 @@ mod test {
 
   #[test]
   fn test_serialize_upgrade_check_file() {
-    let mut file = CheckVersionFile {
-      last_prompt: chrono::DateTime::parse_from_rfc3339("2020-01-01T00:00:00Z")
-        .unwrap()
-        .with_timezone(&chrono::Utc),
-      last_checked: chrono::DateTime::parse_from_rfc3339(
-        "2020-01-01T00:00:00Z",
-      )
-      .unwrap()
-      .with_timezone(&chrono::Utc),
-      latest_version: "1.2.3".to_string(),
-      current_version: "1.2.2".to_string(),
-      current_release_channel: ReleaseChannel::Stable,
-    };
-    assert_eq!(
-      file.serialize(),
-      "2020-01-01T00:00:00+00:00!2020-01-01T00:00:00+00:00!1.2.3!1.2.2!stable"
-    );
-    file.current_release_channel = ReleaseChannel::Canary;
-    assert_eq!(
-      file.serialize(),
-      "2020-01-01T00:00:00+00:00!2020-01-01T00:00:00+00:00!1.2.3!1.2.2!canary"
-    );
-    file.current_release_channel = ReleaseChannel::Rc;
-    assert_eq!(
-      file.serialize(),
-      "2020-01-01T00:00:00+00:00!2020-01-01T00:00:00+00:00!1.2.3!1.2.2!rc"
-    );
-    file.current_release_channel = ReleaseChannel::Lts;
-    assert_eq!(
-      file.serialize(),
-      "2020-01-01T00:00:00+00:00!2020-01-01T00:00:00+00:00!1.2.3!1.2.2!lts"
-    );
+    
   }
 
   #[derive(Clone)]
