@@ -55,6 +55,31 @@ jobs:
     strategy:
       matrix:
         include:
+          - os: macos
+            arch: aarch64
+            runner: macos-14
+            job: build
+            profile: debug
+          - os: macos
+            arch: aarch64
+            runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''macos-14'' }}'
+            job: build
+            profile: release
+            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
+          - os: linux
+            arch: x86_64
+            runner: ubuntu-22.04
+            job: build
+            profile: release
+            use_sysroot: true
+            wpt: '${{ !startsWith(github.ref, ''refs/tags/'') }}'
+          - os: linux
+            arch: x86_64
+            runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'' && !contains(github.event.pull_request.labels.*.name, ''ci-bench''))) && ''ubuntu-22.04'' }}'
+            job: bench
+            profile: release
+            use_sysroot: true
+            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'' && !contains(github.event.pull_request.labels.*.name, ''ci-bench'')) }}'
           - os: linux
             arch: x86_64
             runner: ubuntu-22.04
@@ -132,19 +157,6 @@ jobs:
           version: '21.12'
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
         if: '!(matrix.skip)'
-      - if: |-
-          !(matrix.skip) && (matrix.profile == 'release' &&
-          matrix.job == 'build' &&
-          github.repository == 'unyt-org/deno' &&
-          (github.ref == 'refs/heads/main' ||
-          startsWith(github.ref, 'refs/tags/')))
-        name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          project_id: denoland
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          export_environment_variables: true
-          create_credentials_file: true
       - name: Setup gcloud (unix)
         if: |-
           !(matrix.skip) && (matrix.os != 'windows' &&
@@ -500,21 +512,12 @@ jobs:
             !./target/*/*.zip
             !./target/*/*.tar.gz
           key: '15-cargo-target-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.profile }}-${{ matrix.job }}-${{ github.sha }}'
-  publish-canary:
-    name: publish canary
+  post-build:
+    name: Post Build
     runs-on: ubuntu-22.04
     needs:
       - build
     if: github.repository == 'unyt-org/deno' && github.ref == 'refs/heads/main'
     steps:
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          project_id: denoland
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          export_environment_variables: true
-          create_credentials_file: true
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: denoland
+      - name: Notify dl.unyt.org
+        run: 'curl ''https://dl.unyt.land/admin/update/${{ secrets.DL_UNYT_TOKEN }}'''

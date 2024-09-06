@@ -16,7 +16,7 @@ const macosArmRunner = "macos-14";
 const settings = {
   disableMacOSX86: true,
 
-  disableMacOSArm: true, // Disable for now
+  disableMacOSArm: false, // Disable for now
   disableLinuxX86: false,
 
   disableLinuxArm: true,
@@ -29,7 +29,7 @@ const settings = {
 
   disableLint: true,
   disableDebug: false,
-  disableRelease: true,
+  disableRelease: false,
   disableBench: false
 }
 
@@ -206,17 +206,6 @@ const installDenoStep = {
   name: "Install Deno",
   uses: "denoland/setup-deno@v1",
   with: { "deno-version": "v1.x" },
-};
-
-const authenticateWithGoogleCloud = {
-  name: "Authenticate with Google Cloud",
-  uses: "google-github-actions/auth@v2",
-  with: {
-    "project_id": "denoland",
-    "credentials_json": "${{ secrets.GCP_SA_KEY }}",
-    "export_environment_variables": true,
-    "create_credentials_file": true,
-  },
 };
 
 function skipJobsIfPrAndMarkedSkip(
@@ -522,16 +511,6 @@ const ci = {
         },
         installProtocStep,
         {
-          if: [
-            "matrix.profile == 'release' &&",
-            "matrix.job == 'build' &&",
-            "github.repository == 'unyt-org/deno' &&",
-            "(github.ref == 'refs/heads/main' ||",
-            "startsWith(github.ref, 'refs/tags/'))",
-          ].join("\n"),
-          ...authenticateWithGoogleCloud,
-        },
-        {
           name: "Setup gcloud (unix)",
           if: [
             "matrix.os != 'windows' &&",
@@ -818,7 +797,7 @@ const ci = {
             "APPLE_CODESIGN_KEY": "${{ secrets.APPLE_CODESIGN_KEY }}",
             "APPLE_CODESIGN_PASSWORD": "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
           },
-          run: [
+          run: (settings.disableCodeSign ? [] : [
             'echo "Key is $(echo $APPLE_CODESIGN_KEY | base64 -d | wc -c) bytes"',
             "rcodesign sign target/release/deno " +
             "--code-signature-flags=runtime " +
@@ -829,7 +808,7 @@ const ci = {
             "zip -r deno-${{ matrix.arch }}-apple-darwin.zip deno",
             "strip denort",
             "zip -r denort-${{ matrix.arch }}-apple-darwin.zip denort",
-          ]
+          ])
             .join("\n"),
         },
         {
@@ -1107,28 +1086,19 @@ const ci = {
         },
       ]),
     },
-    "publish-canary": {
-      name: "publish canary",
+    "post-build": {
+      name: "Post Build",
       "runs-on": ubuntuX86Runner,
       needs: ["build"],
       if:
         "github.repository == 'unyt-org/deno' && github.ref == 'refs/heads/main'",
       steps: [
-        authenticateWithGoogleCloud,
         {
-          name: "Setup gcloud",
-          uses: "google-github-actions/setup-gcloud@v2",
-          with: {
-            project_id: "denoland",
-          },
+          name: "Notify dl.unyt.org",
+          run: [
+            "curl 'https://dl.unyt.land/admin/update/${{ secrets.DL_UNYT_TOKEN }}'",
+          ].join("\n"),
         },
-        // {
-        //   name: "Upload canary version file to dl.deno.land",
-        //   run: [
-        //     "echo ${{ github.sha }} > canary-latest.txt",
-        //     'gsutil -h "Cache-Control: no-cache" cp canary-latest.txt gs://dl.deno.land/canary-latest.txt',
-        //   ].join("\n"),
-        // },
       ],
     },
   },
