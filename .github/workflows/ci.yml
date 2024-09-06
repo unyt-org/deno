@@ -62,10 +62,9 @@ jobs:
             profile: debug
           - os: macos
             arch: aarch64
-            runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''macos-14'' }}'
+            runner: macos-14
             job: build
             profile: release
-            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
           - os: linux
             arch: x86_64
             runner: ubuntu-22.04
