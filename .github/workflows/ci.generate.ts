@@ -506,6 +506,7 @@ const ci = {
         },
         {
           name: "TEMP: Upload PR artifact (GitHub)",
+          id: "artifact-upload-step",
           if: [
             "matrix.job == 'build' &&",
             "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
@@ -516,9 +517,22 @@ const ci = {
           uses: "actions/upload-artifact@v4",
           with: {
             name:
-              "deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}",
+              "deno-${{ matrix.profile }}-${{ matrix.os }}-${{ matrix.arch }}",
             path: "target/${{ matrix.profile }}/test.txt",
-          },
+          }
+        },
+        {
+          name: "temp2",
+          if: [
+            "matrix.job == 'build' &&",
+            "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
+            "(github.repository == 'unyt-org/deno' &&",
+            "(github.ref == 'refs/heads/main' ||",
+            "startsWith(github.ref, 'refs/tags/'))))",
+          ].join("\n"),
+          run: [
+            "echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'"
+          ]
         },
         /** */
         {
@@ -801,7 +815,7 @@ const ci = {
           uses: "actions/upload-artifact@v4",
           with: {
             name:
-              "deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}",
+              "deno-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.profile }}",
             path: "target/${{ matrix.profile }}/deno",
           },
         },
