@@ -532,7 +532,7 @@ const ci = {
           ].join("\n"),
           run: [
             "echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'"
-          ]
+          ].join("\n")
         },
         /** */
         {
