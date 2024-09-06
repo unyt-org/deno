@@ -488,7 +488,7 @@ const ci = {
           if: [
             "matrix.os == 'linux' &&",
             "matrix.profile == 'release' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "github.repository == 'unyt-org/deno' &&",
             "startsWith(github.ref, 'refs/tags/')",
           ].join("\n"),
@@ -501,7 +501,7 @@ const ci = {
         installRustStep,
         {
           if:
-            "matrix.job == 'lint' || matrix.job == 'test' || matrix.job == 'bench'",
+            "matrix.job == 'lint' || matrix.job == 'build' || matrix.job == 'bench'",
           ...installDenoStep,
         },
         ...installPythonSteps.map((s) =>
@@ -511,14 +511,14 @@ const ci = {
           )
         ),
         {
-          if: "matrix.job == 'bench' || matrix.job == 'test'",
+          if: "matrix.job == 'bench' || matrix.job == 'build'",
           ...installNodeStep,
         },
         installProtocStep,
         {
           if: [
             "matrix.profile == 'release' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "github.repository == 'unyt-org/deno' &&",
             "(github.ref == 'refs/heads/main' ||",
             "startsWith(github.ref, 'refs/tags/'))",
@@ -530,7 +530,7 @@ const ci = {
           if: [
             "matrix.os != 'windows' &&",
             "matrix.profile == 'release' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "github.repository == 'unyt-org/deno' &&",
             "(github.ref == 'refs/heads/main' ||",
             "startsWith(github.ref, 'refs/tags/'))",
@@ -545,7 +545,7 @@ const ci = {
           if: [
             "matrix.os == 'windows' &&",
             "matrix.profile == 'release' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "github.repository == 'unyt-org/deno' &&",
             "(github.ref == 'refs/heads/main' ||",
             "startsWith(github.ref, 'refs/tags/'))",
@@ -561,7 +561,7 @@ const ci = {
         {
           name: "Configure canary build",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno' &&",
             "github.ref == 'refs/heads/main'",
@@ -700,7 +700,7 @@ const ci = {
         },
         {
           name: "Build debug",
-          if: "matrix.job == 'test' && matrix.profile == 'debug'",
+          if: "matrix.job == 'build' && matrix.profile == 'debug'",
           run: [
             // output fs space before and after building
             "df -h",
@@ -713,7 +713,7 @@ const ci = {
         // {
         //   name: "Setup tmate session",
         //   if: [
-        //     "(matrix.job == 'test' || matrix.job == 'bench') &&",
+        //     "(matrix.job == 'build' || matrix.job == 'bench') &&",
         //     "matrix.profile == 'release' && (matrix.use_sysroot ||",
         //     "github.repository == 'unyt-org/deno')",
         //   ].join("\n"),
@@ -722,7 +722,7 @@ const ci = {
         {
           name: "Build release",
           if: [
-            "(matrix.job == 'test' || matrix.job == 'bench') &&",
+            "(matrix.job == 'build' || matrix.job == 'bench') &&",
             "matrix.profile == 'release' && (matrix.use_sysroot ||",
             "github.repository == 'unyt-org/deno')",
           ].join("\n"),
@@ -737,7 +737,7 @@ const ci = {
           // Run a minimal check to ensure that binary is not corrupted, regardless
           // of our build mode
           name: "Check deno binary",
-          if: "matrix.job == 'test'",
+          if: "matrix.job == 'build'",
           run:
             'target/${{ matrix.profile }}/deno eval "console.log(1+2)" | grep 3',
           env: {
@@ -747,14 +747,14 @@ const ci = {
         {
           // Verify that the binary actually works in the Ubuntu-16.04 sysroot.
           name: "Check deno binary (in sysroot)",
-          if: "matrix.job == 'test' && matrix.use_sysroot",
+          if: "matrix.job == 'build' && matrix.use_sysroot",
           run:
             'sudo chroot /sysroot "$(pwd)/target/${{ matrix.profile }}/deno" --version',
         },
         {
           name: "Upload PR artifact (linux)",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' && (matrix.use_sysroot ||",
             "(github.repository == 'unyt-org/deno' &&",
             "(github.ref == 'refs/heads/main' ||",
@@ -771,7 +771,7 @@ const ci = {
           name: "Pre-release (linux)",
           if: [
             "matrix.os == 'linux' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno'",
           ].join("\n"),
@@ -787,7 +787,7 @@ const ci = {
           name: "Pre-release (mac)",
           if: [
             `matrix.os == 'macos' &&`,
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno'",
           ].join("\n"),
@@ -813,7 +813,7 @@ const ci = {
           name: "Pre-release (windows)",
           if: [
             "matrix.os == 'windows' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno'",
           ].join("\n"),
@@ -826,7 +826,7 @@ const ci = {
         {
           name: "Upload canary to dl.deno.land",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno' &&",
             "github.ref == 'refs/heads/main'",
@@ -841,7 +841,7 @@ const ci = {
           name: "Autobahn testsuite",
           if: [
             "(matrix.os == 'linux' && matrix.arch != 'aarch64') &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "!startsWith(github.ref, 'refs/tags/')",
           ].join("\n"),
@@ -851,7 +851,7 @@ const ci = {
         {
           name: "Test (full, debug)",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'debug' &&",
             "!startsWith(github.ref, 'refs/tags/') &&",
             // Run full tests only on Linux.
@@ -863,7 +863,7 @@ const ci = {
         {
           name: "Test (fast, debug)",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'debug' &&",
             "(startsWith(github.ref, 'refs/tags/') || matrix.os != 'linux')",
           ].join("\n"),
@@ -878,7 +878,7 @@ const ci = {
         {
           name: "Test (release)",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "(matrix.use_sysroot || (",
             "github.repository == 'unyt-org/deno' &&",
@@ -1010,7 +1010,7 @@ const ci = {
           name: "Upload release to dl.deno.land (unix)",
           if: [
             "matrix.os != 'windows' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno' &&",
             "startsWith(github.ref, 'refs/tags/')",
@@ -1022,7 +1022,7 @@ const ci = {
           name: "Upload release to dl.deno.land (windows)",
           if: [
             "matrix.os == 'windows' &&",
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno' &&",
             "startsWith(github.ref, 'refs/tags/')",
@@ -1036,7 +1036,7 @@ const ci = {
         {
           name: "Create release notes",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno' &&",
             "startsWith(github.ref, 'refs/tags/')",
@@ -1050,7 +1050,7 @@ const ci = {
           name: "Upload release to GitHub",
           uses: "softprops/action-gh-release@v0.1.15",
           if: [
-            "matrix.job == 'test' &&",
+            "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
             "github.repository == 'unyt-org/deno' &&",
             "startsWith(github.ref, 'refs/tags/')",
@@ -1082,7 +1082,7 @@ const ci = {
           name: "Save cache build output (main)",
           uses: "actions/cache/save@v4",
           if:
-            "(matrix.job == 'test' || matrix.job == 'lint') && github.ref == 'refs/heads/main'",
+            "(matrix.job == 'build' || matrix.job == 'lint') && github.ref == 'refs/heads/main'",
           with: {
             path: [
               "./target",
