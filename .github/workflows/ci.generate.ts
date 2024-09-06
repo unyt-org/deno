@@ -761,7 +761,7 @@ const ci = {
           name: "Upload PR artifact (GitHub)",
           if: [
             "matrix.job == 'build' &&",
-            "matrix.profile == 'release' && (matrix.use_sysroot ||",
+            "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
             "(github.repository == 'unyt-org/deno' &&",
             "(github.ref == 'refs/heads/main' ||",
             "startsWith(github.ref, 'refs/tags/'))))",
@@ -770,7 +770,7 @@ const ci = {
           with: {
             name:
               "deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}",
-            path: "target/release/deno",
+            path: "target/${{ matrix.profile }}/deno",
           },
         },
         {
