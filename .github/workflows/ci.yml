@@ -43,7 +43,7 @@ jobs:
           echo Commit message: $GIT_MESSAGE
           echo $GIT_MESSAGE | grep '\[ci\]' || (echo 'Exiting due to draft PR. Commit with [ci] to bypass or add the ci-draft label.' ; echo 'skip_build=true' >> $GITHUB_OUTPUT)
   build:
-    name: '${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }} | ${{ ((matrix.skip) && ''canceled'') || '''' }}'
+    name: '${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}${{ ((matrix.skip) && '' | disabled'') || '''' }}'
     needs:
       - pre_build
     if: '${{ needs.pre_build.outputs.skip_build != ''true'' }}'
@@ -58,42 +58,42 @@ jobs:
           - os: macos
             arch: x86_64
             runner: macos-13
-            job: test
+            job: build
             profile: debug
             skip: true
           - os: macos
             arch: x86_64
             runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''macos-13'' }}'
-            job: test
+            job: build
             profile: release
             skip: true
           - os: macos
             arch: aarch64
             runner: macos-14
-            job: test
+            job: build
             profile: debug
           - os: macos
             arch: aarch64
             runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''macos-14'' }}'
-            job: test
+            job: build
             profile: release
             skip: true
           - os: windows
             arch: x86_64
             runner: windows-2022
-            job: test
+            job: build
             profile: debug
             skip: true
           - os: windows
             arch: x86_64
             runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''windows-2022'' }}'
-            job: test
+            job: build
             profile: release
             skip: true
           - os: linux
             arch: x86_64
             runner: ubuntu-22.04
-            job: test
+            job: build
             profile: release
             use_sysroot: true
             wpt: '${{ !startsWith(github.ref, ''refs/tags/'') }}'
@@ -108,7 +108,7 @@ jobs:
           - os: linux
             arch: x86_64
             runner: ubuntu-22.04
-            job: test
+            job: build
             profile: debug
             use_sysroot: true
           - os: linux
@@ -120,13 +120,13 @@ jobs:
           - os: linux
             arch: aarch64
             runner: ubicloud-standard-16-arm
-            job: test
+            job: build
             profile: debug
             skip: true
           - os: linux
             arch: aarch64
             runner: ubicloud-standard-16-arm
-            job: test
+            job: build
             profile: release
             use_sysroot: true
             skip: true
