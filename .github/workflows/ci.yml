@@ -119,8 +119,7 @@ jobs:
           (github.repository == 'unyt-org/deno' &&
           (github.ref == 'refs/heads/main' ||
           startsWith(github.ref, 'refs/tags/')))))
-        run:
-          - 'echo ''Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'''
+        run: 'echo ''Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'''
       - name: 'Create source tarballs (release, linux)'
         if: |-
           !(matrix.skip) && (matrix.os == 'linux' &&
