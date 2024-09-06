@@ -489,53 +489,6 @@ const ci = {
           ...submoduleStep("./cli/bench/testdata/lsp_benchdata"),
           if: "matrix.job == 'bench'",
         },
-        /** temp */
-        {
-          name: "TEMP",
-          if: [
-            "matrix.job == 'build' &&",
-            "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
-            "(github.repository == 'unyt-org/deno' &&",
-            "(github.ref == 'refs/heads/main' ||",
-            "startsWith(github.ref, 'refs/tags/'))))",
-          ].join("\n"),
-          run: [
-            "mkdir -p target/debug",
-            "echo unyt > target/debug/test.txt",
-          ].join("\n"),
-        },
-        {
-          name: "TEMP: Upload PR artifact (GitHub)",
-          id: "artifact-upload-step",
-          if: [
-            "matrix.job == 'build' &&",
-            "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
-            "(github.repository == 'unyt-org/deno' &&",
-            "(github.ref == 'refs/heads/main' ||",
-            "startsWith(github.ref, 'refs/tags/'))))",
-          ].join("\n"),
-          uses: "actions/upload-artifact@v4",
-          with: {
-            name:
-              "deno-${{ matrix.profile }}-${{ matrix.os }}-${{ matrix.arch }}",
-            path: "target/${{ matrix.profile }}/test.txt",
-          }
-        },
-        {
-          name: "temp2",
-          if: [
-            "matrix.job == 'build' &&",
-            "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
-            "(github.repository == 'unyt-org/deno' &&",
-            "(github.ref == 'refs/heads/main' ||",
-            "startsWith(github.ref, 'refs/tags/'))))",
-          ].join("\n"),
-          run: [
-            "echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'",
-            "echo ${{ github.event.pull_request.title }}"
-          ].join("\n")
-        },
-        /** */
         {
           name: "Create source tarballs (release, linux)",
           if: [
@@ -821,6 +774,23 @@ const ci = {
           },
         },
         {
+          // Does only work from PR because then we know about the tag
+          name: "Upload Debug artifact to dl.unyt.land",
+          if: [
+            "${{ github.event_name == 'pull_request' }}",
+            "matrix.job == 'build' &&",
+            "(matrix.profile == 'debug') && (matrix.use_sysroot ||",
+            "(github.repository == 'unyt-org/deno' &&",
+            "(github.ref == 'refs/heads/main' ||",
+            "startsWith(github.ref, 'refs/tags/'))))",
+          ].join("\n"),
+          run: [
+            "echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'",
+            "echo 'Artifact version is ${{ github.event.pull_request.title }}'"
+            // TODO
+          ].join("\n")
+        },
+        {
           name: "Pre-release (linux)",
           if: [
             "matrix.os == 'linux' &&",
@@ -874,20 +844,6 @@ const ci = {
           run: [
             "Compress-Archive -CompressionLevel Optimal -Force -Path target/release/deno.exe -DestinationPath target/release/deno-${{ matrix.arch }}-pc-windows-msvc.zip",
             "Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.exe -DestinationPath target/release/denort-${{ matrix.arch }}-pc-windows-msvc.zip",
-          ].join("\n"),
-        },
-        {
-          name: "Upload canary to dl.unyt.land",
-          if: [
-            "matrix.job == 'build' &&",
-            "matrix.profile == 'release' &&",
-            "github.repository == 'unyt-org/deno' &&",
-            "github.ref == 'refs/heads/main'",
-          ].join("\n"),
-          run: [
-            'gsutil -h "Cache-Control: public, max-age=3600" cp ./target/release/*.zip gs://dl.deno.land/canary/$(git rev-parse HEAD)/',
-            "echo ${{ github.sha }} > canary-latest.txt",
-            'gsutil -h "Cache-Control: no-cache" cp canary-latest.txt gs://dl.deno.land/canary-$(rustc -vV | sed -n "s|host: ||p")-latest.txt',
           ].join("\n"),
         },
         {
@@ -1061,33 +1017,33 @@ const ci = {
             "cat /proc/meminfo",
           ].join("\n"),
         },
-        {
-          name: "Upload release to dl.unyt.land (unix)",
-          if: [
-            "matrix.os != 'windows' &&",
-            "matrix.job == 'build' &&",
-            "matrix.profile == 'release' &&",
-            "github.repository == 'unyt-org/deno' &&",
-            "startsWith(github.ref, 'refs/tags/')",
-          ].join("\n"),
-          run:
-            'gsutil -h "Cache-Control: public, max-age=3600" cp ./target/release/*.zip gs://dl.deno.land/release/${GITHUB_REF#refs/*/}/',
-        },
-        {
-          name: "Upload release to dl.unyt.land (windows)",
-          if: [
-            "matrix.os == 'windows' &&",
-            "matrix.job == 'build' &&",
-            "matrix.profile == 'release' &&",
-            "github.repository == 'unyt-org/deno' &&",
-            "startsWith(github.ref, 'refs/tags/')",
-          ].join("\n"),
-          env: {
-            CLOUDSDK_PYTHON: "${{env.pythonLocation}}\\python.exe",
-          },
-          run:
-            'gsutil -h "Cache-Control: public, max-age=3600" cp ./target/release/*.zip gs://dl.deno.land/release/${GITHUB_REF#refs/*/}/',
-        },
+        // {
+        //   name: "Upload release to dl.unyt.land (unix)",
+        //   if: [
+        //     "matrix.os != 'windows' &&",
+        //     "matrix.job == 'build' &&",
+        //     "matrix.profile == 'release' &&",
+        //     "github.repository == 'unyt-org/deno' &&",
+        //     "startsWith(github.ref, 'refs/tags/')",
+        //   ].join("\n"),
+        //   run:
+        //     'gsutil -h "Cache-Control: public, max-age=3600" cp ./target/release/*.zip gs://dl.deno.land/release/${GITHUB_REF#refs/*/}/',
+        // },
+        // {
+        //   name: "Upload release to dl.unyt.land (windows)",
+        //   if: [
+        //     "matrix.os == 'windows' &&",
+        //     "matrix.job == 'build' &&",
+        //     "matrix.profile == 'release' &&",
+        //     "github.repository == 'unyt-org/deno' &&",
+        //     "startsWith(github.ref, 'refs/tags/')",
+        //   ].join("\n"),
+        //   env: {
+        //     CLOUDSDK_PYTHON: "${{env.pythonLocation}}\\python.exe",
+        //   },
+        //   run:
+        //     'gsutil -h "Cache-Control: public, max-age=3600" cp ./target/release/*.zip gs://dl.deno.land/release/${GITHUB_REF#refs/*/}/',
+        // },
         {
           name: "Create release notes",
           if: [
