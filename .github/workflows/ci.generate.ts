@@ -223,7 +223,7 @@ function skipJobsIfPrAndMarkedSkip(
   return steps.map((s) =>
     withCondition(
       s,
-      "!(matrix.skip)",
+      "!(matrix.skip) && !(matrix.disabled)",
     )
   );
 }
