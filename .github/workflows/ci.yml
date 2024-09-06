@@ -43,7 +43,7 @@ jobs:
           echo Commit message: $GIT_MESSAGE
           echo $GIT_MESSAGE | grep '\[ci\]' || (echo 'Exiting due to draft PR. Commit with [ci] to bypass or add the ci-draft label.' ; echo 'skip_build=true' >> $GITHUB_OUTPUT)
   build:
-    name: '${{ matrix.profile }}: ${{ matrix.job }} (${{ matrix.os }}-${{ matrix.arch }}) | ${{ !matrix.skip }}'
+    name: '${{ matrix.profile }}: ${{ matrix.job }} (${{ matrix.os }}-${{ matrix.arch }}) | ${{ (!matrix.skip && active) }}'
     needs:
       - pre_build
     if: '${{ needs.pre_build.outputs.skip_build != ''true'' }}'
