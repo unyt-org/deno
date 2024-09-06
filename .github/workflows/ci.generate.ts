@@ -830,7 +830,7 @@ const ci = {
           ].join("\n"),
         },
         {
-          name: "Upload canary to dl.deno.land",
+          name: "Upload canary to dl.unyt.land",
           if: [
             "matrix.job == 'build' &&",
             "matrix.profile == 'release' &&",
@@ -893,14 +893,12 @@ const ci = {
             ].join("\n"),
             run: "cargo test --release --locked",
           },
-        ]),
-        {
-          name: "Configure hosts file for WPT",
-          if: "matrix.wpt",
-          run: "./wpt make-hosts-file | sudo tee -a /etc/hosts",
-          "working-directory": "tests/wpt/suite/",
-        },
-        ...(settings.disableTests ? [] : [
+          {
+            name: "Configure hosts file for WPT",
+            if: "matrix.wpt",
+            run: "./wpt make-hosts-file | sudo tee -a /etc/hosts",
+            "working-directory": "tests/wpt/suite/",
+          },
           {
             name: "Run web platform tests (debug)",
             if: "matrix.wpt && matrix.profile == 'debug'",
@@ -969,6 +967,7 @@ const ci = {
         //     "    ./tools/upload_wptfyi.js $(git rev-parse HEAD) --ghstatus",
         //   ].join("\n"),
         // },
+
         {
           name: "Run benchmarks",
           if: "matrix.job == 'bench' && !startsWith(github.ref, 'refs/tags/')",
@@ -1119,13 +1118,13 @@ const ci = {
             project_id: "denoland",
           },
         },
-        {
-          name: "Upload canary version file to dl.deno.land",
-          run: [
-            "echo ${{ github.sha }} > canary-latest.txt",
-            'gsutil -h "Cache-Control: no-cache" cp canary-latest.txt gs://dl.deno.land/canary-latest.txt',
-          ].join("\n"),
-        },
+        // {
+        //   name: "Upload canary version file to dl.deno.land",
+        //   run: [
+        //     "echo ${{ github.sha }} > canary-latest.txt",
+        //     'gsutil -h "Cache-Control: no-cache" cp canary-latest.txt gs://dl.deno.land/canary-latest.txt',
+        //   ].join("\n"),
+        // },
       ],
     },
   },
