@@ -101,6 +101,7 @@ jobs:
           mkdir -p target/debug
           echo unyt > target/debug/test.txt
       - name: 'TEMP: Upload PR artifact (GitHub)'
+        id: artifact-upload-step
         if: |-
           !(matrix.skip) && (matrix.job == 'build' &&
           (matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||
@@ -109,8 +110,17 @@ jobs:
           startsWith(github.ref, 'refs/tags/')))))
         uses: actions/upload-artifact@v4
         with:
-          name: 'deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}'
+          name: 'deno-${{ matrix.profile }}-${{ matrix.os }}-${{ matrix.arch }}'
           path: 'target/${{ matrix.profile }}/test.txt'
+      - name: temp2
+        if: |-
+          !(matrix.skip) && (matrix.job == 'build' &&
+          (matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||
+          (github.repository == 'unyt-org/deno' &&
+          (github.ref == 'refs/heads/main' ||
+          startsWith(github.ref, 'refs/tags/')))))
+        run:
+          - 'echo ''Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'''
       - name: 'Create source tarballs (release, linux)'
         if: |-
           !(matrix.skip) && (matrix.os == 'linux' &&
@@ -386,7 +396,7 @@ jobs:
           startsWith(github.ref, 'refs/tags/')))))
         uses: actions/upload-artifact@v4
         with:
-          name: 'deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}'
+          name: 'deno-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.profile }}'
           path: 'target/${{ matrix.profile }}/deno'
       - name: Pre-release (linux)
         if: |-
