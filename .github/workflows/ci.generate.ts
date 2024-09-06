@@ -376,7 +376,7 @@ const ci = {
           }, {
             ...Runners.macosArm,
             job: "test",
-            profile: "debug",
+            profile: "debug"
           }, {
             ...Runners.macosArm,
             job: "test",
