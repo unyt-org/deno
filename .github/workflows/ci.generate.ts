@@ -378,7 +378,7 @@ const ci = {
       name:
         "${{ matrix.job }} ${{ matrix.profile }} ${{ matrix.os }}-${{ matrix.arch }}${{ ((matrix.disabled) && ' | disabled') || '' }}",
       needs: ["pre_build"],
-      if: "!(matrix.disabled) && ${{ needs.pre_build.outputs.skip_build != 'true' }}",
+      if: "${{ !matrix.disabled && needs.pre_build.outputs.skip_build != 'true' }}",
       "runs-on": "${{ matrix.runner }}",
       "timeout-minutes": 150,
       defaults: {
