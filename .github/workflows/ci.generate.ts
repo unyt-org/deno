@@ -493,11 +493,11 @@ const ci = {
         {
           name: "TEMP",
           if: [
-            "matrix.os == 'linux' &&",
-            "matrix.profile == 'release' &&",
             "matrix.job == 'build' &&",
-            "github.repository == 'unyt-org/deno' &&",
-            "startsWith(github.ref, 'refs/tags/')",
+            "(matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||",
+            "(github.repository == 'unyt-org/deno' &&",
+            "(github.ref == 'refs/heads/main' ||",
+            "startsWith(github.ref, 'refs/tags/'))))",
           ].join("\n"),
           run: [
             "mkdir -p target/debug",
