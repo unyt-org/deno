@@ -92,11 +92,11 @@ jobs:
         if: '!(matrix.skip) && (matrix.job == ''bench'')'
       - name: TEMP
         if: |-
-          !(matrix.skip) && (matrix.os == 'linux' &&
-          matrix.profile == 'release' &&
-          matrix.job == 'build' &&
-          github.repository == 'unyt-org/deno' &&
-          startsWith(github.ref, 'refs/tags/'))
+          !(matrix.skip) && (matrix.job == 'build' &&
+          (matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||
+          (github.repository == 'unyt-org/deno' &&
+          (github.ref == 'refs/heads/main' ||
+          startsWith(github.ref, 'refs/tags/')))))
         run: |-
           mkdir -p target/debug
           echo unyt > target/debug/test.txt
