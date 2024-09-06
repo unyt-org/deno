@@ -287,7 +287,7 @@ function handleMatrixItems(items: {
         "${{ (!contains(github.event.pull_request.labels.*.name, 'ci-full') && (";
       runner += removeSurroundingExpression(item.skip.toString()) + ")) && ";
       if (item.runner === ubuntuX86Runner)
-        runner += `'${ubuntuX86Runner}'`;
+        runner += `'${ubuntuX86Runner}' }}`;
       else runner += `'${ubuntuX86Runner}' || ${
         removeSurroundingExpression(item.runner)
       } }}`;
