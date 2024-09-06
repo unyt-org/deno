@@ -8,24 +8,31 @@ import { stringify } from "jsr:@std/yaml@^0.221/stringify";
 const cacheVersion = 15;
 
 const ubuntuX86Runner = "ubuntu-22.04";
-const ubuntuX86XlRunner = "ubuntu-22.04-xl";
 const ubuntuARMRunner = "ubicloud-standard-16-arm";
 const windowsX86Runner = "windows-2022";
-const windowsX86XlRunner = "windows-2022-xl";
 const macosX86Runner = "macos-13";
 const macosArmRunner = "macos-14";
+
+const settings = {
+  disableMacOSX86: true,
+
+  disableMacOSArm: false,
+  disableLinuxX86: false,
+
+  disableLinuxArm: true,
+  disableWindows: true,
+
+  disableLint: true,
+  disableDebug: false,
+  disableRelease: true,
+  disableBench: false
+}
 
 const Runners = {
   linuxX86: {
     os: "linux",
     arch: "x86_64",
     runner: ubuntuX86Runner,
-  },
-  linuxX86Xl: {
-    os: "linux",
-    arch: "x86_64",
-    runner:
-      `\${{ github.repository == 'unyt-org/deno' && '${ubuntuX86XlRunner}' || '${ubuntuX86Runner}' }}`,
   },
   linuxArm: {
     os: "linux",
@@ -35,7 +42,7 @@ const Runners = {
   macosX86: {
     os: "macos",
     arch: "x86_64",
-    runner: macosX86Runner,
+    runner: macosX86Runner
   },
   macosArm: {
     os: "macos",
@@ -46,13 +53,7 @@ const Runners = {
     os: "windows",
     arch: "x86_64",
     runner: windowsX86Runner,
-  },
-  windowsX86Xl: {
-    os: "windows",
-    arch: "x86_64",
-    runner:
-      `\${{ github.repository == 'unyt-org/deno' && '${windowsX86XlRunner}' || '${windowsX86Runner}' }}`,
-  },
+  }
 } as const;
 
 const prCacheKeyPrefix =
@@ -258,7 +259,7 @@ function removeSurroundingExpression(text: string) {
 
 function handleMatrixItems(items: {
   skip_pr?: string | true;
-  skip?: string;
+  skip?: string | boolean;
   os: "linux" | "macos" | "windows";
   arch: "x86_64" | "aarch64";
   runner: string;
@@ -285,7 +286,9 @@ function handleMatrixItems(items: {
       let runner =
         "${{ (!contains(github.event.pull_request.labels.*.name, 'ci-full') && (";
       runner += removeSurroundingExpression(item.skip.toString()) + ")) && ";
-      runner += `'${ubuntuX86Runner}' || ${
+      if (item.runner === ubuntuX86Runner)
+        runner += `'${ubuntuX86Runner}'`;
+      else runner += `'${ubuntuX86Runner}' || ${
         removeSurroundingExpression(item.runner)
       } }}`;
 
@@ -295,6 +298,23 @@ function handleMatrixItems(items: {
         "${{ !contains(github.event.pull_request.labels.*.name, 'ci-full') && (" +
         removeSurroundingExpression(item.skip.toString()) + ") }}";
     }
+
+    if (
+      // os + arch
+      (item.os === "windows" && settings.disableWindows) ||
+      (item.os === "linux" && item.arch === "x86_64" && settings.disableLinuxX86) ||
+      (item.os === "linux" && item.arch === "aarch64" && settings.disableLinuxArm) ||
+      (item.os === "macos" && item.arch === "aarch64" && settings.disableMacOSArm) ||
+      (item.os === "macos" && item.arch === "x86_64" && settings.disableMacOSX86) ||
+
+      // profile
+      (item.profile === "debug" && settings.disableDebug) ||
+      (item.profile === "release" && settings.disableRelease) ||
+
+      // job
+      (item.job === "lint" && settings.disableLint) ||
+      (item.job === "bench" && settings.disableBench)
+    ) item.skip = true;
 
     return { ...item };
   });
@@ -376,7 +396,7 @@ const ci = {
           }, {
             ...Runners.macosArm,
             job: "test",
-            profile: "debug"
+            profile: "debug",
           }, {
             ...Runners.macosArm,
             job: "test",
@@ -387,12 +407,12 @@ const ci = {
             job: "test",
             profile: "debug",
           }, {
-            ...Runners.windowsX86Xl,
+            ...Runners.windowsX86,
             job: "test",
             profile: "release",
             skip_pr: true,
           }, {
-            ...Runners.linuxX86Xl,
+            ...Runners.linuxX86,
             job: "test",
             profile: "release",
             use_sysroot: true,
@@ -400,7 +420,7 @@ const ci = {
             // currently run the Web Platform tests only on Linux.
             wpt: "${{ !startsWith(github.ref, 'refs/tags/') }}",
           }, {
-            ...Runners.linuxX86Xl,
+            ...Runners.linuxX86,
             job: "bench",
             profile: "release",
             use_sysroot: true,
@@ -495,49 +515,49 @@ const ci = {
           ...installNodeStep,
         },
         installProtocStep,
-        // {
-        //   if: [
-        //     "matrix.profile == 'release' &&",
-        //     "matrix.job == 'test' &&",
-        //     "github.repository == 'unyt-org/deno' &&",
-        //     "(github.ref == 'refs/heads/main' ||",
-        //     "startsWith(github.ref, 'refs/tags/'))",
-        //   ].join("\n"),
-        //   ...authenticateWithGoogleCloud,
-        // },
-        // {
-        //   name: "Setup gcloud (unix)",
-        //   if: [
-        //     "matrix.os != 'windows' &&",
-        //     "matrix.profile == 'release' &&",
-        //     "matrix.job == 'test' &&",
-        //     "github.repository == 'unyt-org/deno' &&",
-        //     "(github.ref == 'refs/heads/main' ||",
-        //     "startsWith(github.ref, 'refs/tags/'))",
-        //   ].join("\n"),
-        //   uses: "google-github-actions/setup-gcloud@v2",
-        //   with: {
-        //     project_id: "denoland",
-        //   },
-        // },
-        // {
-        //   name: "Setup gcloud (windows)",
-        //   if: [
-        //     "matrix.os == 'windows' &&",
-        //     "matrix.profile == 'release' &&",
-        //     "matrix.job == 'test' &&",
-        //     "github.repository == 'unyt-org/deno' &&",
-        //     "(github.ref == 'refs/heads/main' ||",
-        //     "startsWith(github.ref, 'refs/tags/'))",
-        //   ].join("\n"),
-        //   uses: "google-github-actions/setup-gcloud@v2",
-        //   env: {
-        //     CLOUDSDK_PYTHON: "${{env.pythonLocation}}\\python.exe",
-        //   },
-        //   with: {
-        //     project_id: "denoland",
-        //   },
-        // },
+        {
+          if: [
+            "matrix.profile == 'release' &&",
+            "matrix.job == 'test' &&",
+            "github.repository == 'unyt-org/deno' &&",
+            "(github.ref == 'refs/heads/main' ||",
+            "startsWith(github.ref, 'refs/tags/'))",
+          ].join("\n"),
+          ...authenticateWithGoogleCloud,
+        },
+        {
+          name: "Setup gcloud (unix)",
+          if: [
+            "matrix.os != 'windows' &&",
+            "matrix.profile == 'release' &&",
+            "matrix.job == 'test' &&",
+            "github.repository == 'unyt-org/deno' &&",
+            "(github.ref == 'refs/heads/main' ||",
+            "startsWith(github.ref, 'refs/tags/'))",
+          ].join("\n"),
+          uses: "google-github-actions/setup-gcloud@v2",
+          with: {
+            project_id: "denoland",
+          },
+        },
+        {
+          name: "Setup gcloud (windows)",
+          if: [
+            "matrix.os == 'windows' &&",
+            "matrix.profile == 'release' &&",
+            "matrix.job == 'test' &&",
+            "github.repository == 'unyt-org/deno' &&",
+            "(github.ref == 'refs/heads/main' ||",
+            "startsWith(github.ref, 'refs/tags/'))",
+          ].join("\n"),
+          uses: "google-github-actions/setup-gcloud@v2",
+          env: {
+            CLOUDSDK_PYTHON: "${{env.pythonLocation}}\\python.exe",
+          },
+          with: {
+            project_id: "denoland",
+          },
+        },
         {
           name: "Configure canary build",
           if: [
