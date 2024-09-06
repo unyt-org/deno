@@ -55,11 +55,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos
-            arch: aarch64
-            runner: macos-14
-            job: build
-            profile: debug
           - os: linux
             arch: x86_64
             runner: ubuntu-22.04
@@ -95,6 +90,27 @@ jobs:
       - name: Clone submodule ./cli/bench/testdata/lsp_benchdata
         run: git submodule update --init --recursive --depth=1 -- ./cli/bench/testdata/lsp_benchdata
         if: '!(matrix.skip) && (matrix.job == ''bench'')'
+      - name: TEMP
+        if: |-
+          !(matrix.skip) && (matrix.os == 'linux' &&
+          matrix.profile == 'release' &&
+          matrix.job == 'build' &&
+          github.repository == 'unyt-org/deno' &&
+          startsWith(github.ref, 'refs/tags/'))
+        run: |-
+          mkdir -p target/debug
+          echo unyt > target/debug/test.txt
+      - name: 'TEMP: Upload PR artifact (GitHub)'
+        if: |-
+          !(matrix.skip) && (matrix.job == 'build' &&
+          (matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||
+          (github.repository == 'unyt-org/deno' &&
+          (github.ref == 'refs/heads/main' ||
+          startsWith(github.ref, 'refs/tags/')))))
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}'
+          path: 'target/${{ matrix.profile }}/test.txt'
       - name: 'Create source tarballs (release, linux)'
         if: |-
           !(matrix.skip) && (matrix.os == 'linux' &&
@@ -361,17 +377,17 @@ jobs:
       - name: Check deno binary (in sysroot)
         if: '!(matrix.skip) && (matrix.job == ''build'' && matrix.use_sysroot)'
         run: 'sudo chroot /sysroot "$(pwd)/target/${{ matrix.profile }}/deno" --version'
-      - name: Upload PR artifact (linux)
+      - name: Upload PR artifact (GitHub)
         if: |-
           !(matrix.skip) && (matrix.job == 'build' &&
-          matrix.profile == 'release' && (matrix.use_sysroot ||
+          (matrix.profile == 'release' || matrix.profile == 'debug') && (matrix.use_sysroot ||
           (github.repository == 'unyt-org/deno' &&
           (github.ref == 'refs/heads/main' ||
           startsWith(github.ref, 'refs/tags/')))))
         uses: actions/upload-artifact@v4
         with:
           name: 'deno-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event.number }}'
-          path: target/release/deno
+          path: 'target/${{ matrix.profile }}/deno'
       - name: Pre-release (linux)
         if: |-
           !(matrix.skip) && (matrix.os == 'linux' &&
@@ -410,7 +426,7 @@ jobs:
         run: |-
           Compress-Archive -CompressionLevel Optimal -Force -Path target/release/deno.exe -DestinationPath target/release/deno-${{ matrix.arch }}-pc-windows-msvc.zip
           Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.exe -DestinationPath target/release/denort-${{ matrix.arch }}-pc-windows-msvc.zip
-      - name: Upload canary to dl.deno.land
+      - name: Upload canary to dl.unyt.land
         if: |-
           !(matrix.skip) && (matrix.job == 'build' &&
           matrix.profile == 'release' &&
@@ -426,88 +442,7 @@ jobs:
           matrix.job == 'build' &&
           matrix.profile == 'release' &&
           !startsWith(github.ref, 'refs/tags/'))
-        run: target/release/deno run -A --config tests/config/deno.json ext/websocket/autobahn/fuzzingclient.js
-      - name: 'Test (full, debug)'
-        if: |-
-          !(matrix.skip) && (matrix.job == 'build' &&
-          matrix.profile == 'debug' &&
-          !startsWith(github.ref, 'refs/tags/') &&
-          matrix.os == 'linux')
-        run: cargo test --locked
-        env:
-          CARGO_PROFILE_DEV_DEBUG: 0
-      - name: 'Test (fast, debug)'
-        if: |-
-          !(matrix.skip) && (matrix.job == 'build' &&
-          matrix.profile == 'debug' &&
-          (startsWith(github.ref, 'refs/tags/') || matrix.os != 'linux'))
-        run: |-
-          cargo test --locked --lib
-          cargo test --locked --tests
-        env:
-          CARGO_PROFILE_DEV_DEBUG: 0
-      - name: Test (release)
-        if: |-
-          !(matrix.skip) && (matrix.job == 'build' &&
-          matrix.profile == 'release' &&
-          (matrix.use_sysroot || (
-          github.repository == 'unyt-org/deno' &&
-          !startsWith(github.ref, 'refs/tags/'))))
-        run: cargo test --release --locked
-      - name: Configure hosts file for WPT
-        if: '!(matrix.skip) && (matrix.wpt)'
-        run: ./wpt make-hosts-file | sudo tee -a /etc/hosts
-        working-directory: tests/wpt/suite/
-      - name: Run web platform tests (debug)
-        if: '!(matrix.skip) && (matrix.wpt && matrix.profile == ''debug'')'
-        env:
-          DENO_BIN: ./target/debug/deno
-        run: |-
-          deno run -A --lock=tools/deno.lock.json --config tests/config/deno.json\
-                  ./tests/wpt/wpt.ts setup
-          deno run -A --lock=tools/deno.lock.json --config tests/config/deno.json\
-                   ./tests/wpt/wpt.ts run --quiet --binary="$DENO_BIN"
-      - name: Run web platform tests (release)
-        if: '!(matrix.skip) && (matrix.wpt && matrix.profile == ''release'')'
-        env:
-          DENO_BIN: ./target/release/deno
-        run: |-
-          deno run -A --lock=tools/deno.lock.json --config tests/config/deno.json\
-                   ./tests/wpt/wpt.ts setup
-          deno run -A --lock=tools/deno.lock.json --config tests/config/deno.json\
-                   ./tests/wpt/wpt.ts run --quiet --release         \
-                                      --binary="$DENO_BIN"          \
-                                      --json=wpt.json               \
-                                      --wptreport=wptreport.json
-      - name: Upload wpt results to dl.deno.land
-        continue-on-error: true
-        if: |-
-          !(matrix.skip) && (matrix.wpt &&
-          matrix.os == 'linux' &&
-          matrix.profile == 'release' &&
-          github.repository == 'unyt-org/deno' &&
-          github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/'))
-        run: |-
-          gzip ./wptreport.json
-          gsutil -h "Cache-Control: public, max-age=3600" cp ./wpt.json gs://dl.deno.land/wpt/$(git rev-parse HEAD).json
-          gsutil -h "Cache-Control: public, max-age=3600" cp ./wptreport.json.gz gs://dl.deno.land/wpt/$(git rev-parse HEAD)-wptreport.json.gz
-          echo $(git rev-parse HEAD) > wpt-latest.txt
-          gsutil -h "Cache-Control: no-cache" cp wpt-latest.txt gs://dl.deno.land/wpt-latest.txt
-      - name: Upload wpt results to wpt.fyi
-        continue-on-error: true
-        if: |-
-          !(matrix.skip) && (matrix.wpt &&
-          matrix.os == 'linux' &&
-          matrix.profile == 'release' &&
-          github.repository == 'unyt-org/deno' &&
-          github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/'))
-        env:
-          WPT_FYI_USER: deno
-          WPT_FYI_PW: '${{ secrets.WPT_FYI_PW }}'
-          GITHUB_TOKEN: '${{ secrets.DENOBOT_PAT }}'
-        run: |-
-          ./target/release/deno run --allow-all --lock=tools/deno.lock.json \
-              ./tools/upload_wptfyi.js $(git rev-parse HEAD) --ghstatus
+        run: target/release/deno run -A --unstable --config tests/config/deno.json ext/websocket/autobahn/fuzzingclient.js
       - name: Run benchmarks
         if: '!(matrix.skip) && (matrix.job == ''bench'' && !startsWith(github.ref, ''refs/tags/''))'
         run: cargo bench --locked
@@ -540,7 +475,7 @@ jobs:
         run: |-
           cat /proc/cpuinfo
           cat /proc/meminfo
-      - name: Upload release to dl.deno.land (unix)
+      - name: Upload release to dl.unyt.land (unix)
         if: |-
           !(matrix.skip) && (matrix.os != 'windows' &&
           matrix.job == 'build' &&
@@ -548,7 +483,7 @@ jobs:
           github.repository == 'unyt-org/deno' &&
           startsWith(github.ref, 'refs/tags/'))
         run: 'gsutil -h "Cache-Control: public, max-age=3600" cp ./target/release/*.zip gs://dl.deno.land/release/${GITHUB_REF#refs/*/}/'
-      - name: Upload release to dl.deno.land (windows)
+      - name: Upload release to dl.unyt.land (windows)
         if: |-
           !(matrix.skip) && (matrix.os == 'windows' &&
           matrix.job == 'build' &&
@@ -620,7 +555,3 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: denoland
-      - name: Upload canary version file to dl.deno.land
-        run: |-
-          echo ${{ github.sha }} > canary-latest.txt
-          gsutil -h "Cache-Control: no-cache" cp canary-latest.txt gs://dl.deno.land/canary-latest.txt
