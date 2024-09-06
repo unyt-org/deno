@@ -60,12 +60,13 @@ jobs:
             runner: macos-13
             job: test
             profile: debug
+            skip: true
           - os: macos
             arch: x86_64
             runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''macos-13'' }}'
             job: test
             profile: release
-            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
+            skip: true
           - os: macos
             arch: aarch64
             runner: macos-14
@@ -76,32 +77,34 @@ jobs:
             runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''macos-14'' }}'
             job: test
             profile: release
-            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
+            skip: true
           - os: windows
             arch: x86_64
             runner: windows-2022
             job: test
             profile: debug
+            skip: true
           - os: windows
             arch: x86_64
-            runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || github.repository == ''unyt-org/deno'' && ''windows-2022-xl'' || ''windows-2022'' }}'
+            runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'')) && ''ubuntu-22.04'' || ''windows-2022'' }}'
             job: test
             profile: release
-            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'') }}'
+            skip: true
           - os: linux
             arch: x86_64
-            runner: '${{ github.repository == ''unyt-org/deno'' && ''ubuntu-22.04-xl'' || ''ubuntu-22.04'' }}'
+            runner: ubuntu-22.04
             job: test
             profile: release
             use_sysroot: true
             wpt: '${{ !startsWith(github.ref, ''refs/tags/'') }}'
+            skip: true
           - os: linux
             arch: x86_64
-            runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'' && !contains(github.event.pull_request.labels.*.name, ''ci-bench''))) && ''ubuntu-22.04'' || github.repository == ''unyt-org/deno'' && ''ubuntu-22.04-xl'' || ''ubuntu-22.04'' }}'
+            runner: '${{ (!contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'' && !contains(github.event.pull_request.labels.*.name, ''ci-bench''))) && ''ubuntu-22.04'''
             job: bench
             profile: release
             use_sysroot: true
-            skip: '${{ !contains(github.event.pull_request.labels.*.name, ''ci-full'') && (github.event_name == ''pull_request'' && !contains(github.event.pull_request.labels.*.name, ''ci-bench'')) }}'
+            skip: true
           - os: linux
             arch: x86_64
             runner: ubuntu-22.04
@@ -113,27 +116,32 @@ jobs:
             runner: ubuntu-22.04
             job: lint
             profile: debug
+            skip: true
           - os: linux
             arch: aarch64
             runner: ubicloud-standard-16-arm
             job: test
             profile: debug
+            skip: true
           - os: linux
             arch: aarch64
             runner: ubicloud-standard-16-arm
             job: test
             profile: release
             use_sysroot: true
+            skip: true
           - os: macos
             arch: x86_64
             runner: macos-13
             job: lint
             profile: debug
+            skip: true
           - os: windows
             arch: x86_64
             runner: windows-2022
             job: lint
             profile: debug
+            skip: true
       fail-fast: '${{ github.event_name == ''pull_request'' || (github.ref != ''refs/heads/main'' && !startsWith(github.ref, ''refs/tags/'')) }}'
     env:
       CARGO_TERM_COLOR: always
@@ -205,6 +213,43 @@ jobs:
           version: '21.12'
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
         if: '!(matrix.skip)'
+      - if: |-
+          !(matrix.skip) && (matrix.profile == 'release' &&
+          matrix.job == 'test' &&
+          github.repository == 'unyt-org/deno' &&
+          (github.ref == 'refs/heads/main' ||
+          startsWith(github.ref, 'refs/tags/')))
+        name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: denoland
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          export_environment_variables: true
+          create_credentials_file: true
+      - name: Setup gcloud (unix)
+        if: |-
+          !(matrix.skip) && (matrix.os != 'windows' &&
+          matrix.profile == 'release' &&
+          matrix.job == 'test' &&
+          github.repository == 'unyt-org/deno' &&
+          (github.ref == 'refs/heads/main' ||
+          startsWith(github.ref, 'refs/tags/')))
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: denoland
+      - name: Setup gcloud (windows)
+        if: |-
+          !(matrix.skip) && (matrix.os == 'windows' &&
+          matrix.profile == 'release' &&
+          matrix.job == 'test' &&
+          github.repository == 'unyt-org/deno' &&
+          (github.ref == 'refs/heads/main' ||
+          startsWith(github.ref, 'refs/tags/')))
+        uses: google-github-actions/setup-gcloud@v2
+        env:
+          CLOUDSDK_PYTHON: '${{env.pythonLocation}}\python.exe'
+        with:
+          project_id: denoland
       - name: Configure canary build
         if: |-
           !(matrix.skip) && (matrix.job == 'test' &&
@@ -473,7 +518,8 @@ jobs:
           matrix.profile == 'debug' &&
           (startsWith(github.ref, 'refs/tags/') || matrix.os != 'linux'))
         run: |-
-          echo skipping
+          cargo test --locked --lib
+          cargo test --locked --tests
         env:
           CARGO_PROFILE_DEV_DEBUG: 0
       - name: Test (release)
