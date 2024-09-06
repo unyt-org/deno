@@ -387,7 +387,7 @@ const ci = {
             ...Runners.macosX86,
             job: "build",
             profile: "release",
-            skip_pr: true,
+            // skip_pr: true,
           }, {
             ...Runners.macosArm,
             job: "build",
@@ -396,7 +396,7 @@ const ci = {
             ...Runners.macosArm,
             job: "build",
             profile: "release",
-            skip_pr: true,
+            // skip_pr: true,
           }, {
             ...Runners.windowsX86,
             job: "build",
@@ -405,7 +405,7 @@ const ci = {
             ...Runners.windowsX86,
             job: "build",
             profile: "release",
-            skip_pr: true,
+            // skip_pr: true,
           }, {
             ...Runners.linuxX86,
             job: "build",
