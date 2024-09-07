@@ -513,39 +513,6 @@ const ci = {
         },
         installProtocStep,
         {
-          name: "Setup gcloud (unix)",
-          if: [
-            "matrix.os != 'windows' &&",
-            "matrix.profile == 'release' &&",
-            "matrix.job == 'build' &&",
-            "github.repository == 'unyt-org/deno' &&",
-            "(github.ref == 'refs/heads/main' ||",
-            "startsWith(github.ref, 'refs/tags/'))",
-          ].join("\n"),
-          uses: "google-github-actions/setup-gcloud@v2",
-          with: {
-            project_id: "denoland",
-          },
-        },
-        {
-          name: "Setup gcloud (windows)",
-          if: [
-            "matrix.os == 'windows' &&",
-            "matrix.profile == 'release' &&",
-            "matrix.job == 'build' &&",
-            "github.repository == 'unyt-org/deno' &&",
-            "(github.ref == 'refs/heads/main' ||",
-            "startsWith(github.ref, 'refs/tags/'))",
-          ].join("\n"),
-          uses: "google-github-actions/setup-gcloud@v2",
-          env: {
-            CLOUDSDK_PYTHON: "${{env.pythonLocation}}\\python.exe",
-          },
-          with: {
-            project_id: "denoland",
-          },
-        },
-        {
           name: "Configure canary build",
           if: [
             "matrix.job == 'build' &&",
