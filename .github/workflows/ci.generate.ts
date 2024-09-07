@@ -1089,7 +1089,7 @@ const ci = {
       ]),
     },
     "post-build": {
-      name: "Post Build",
+      name: "post-build",
       "runs-on": ubuntuX86Runner,
       needs: ["build"],
       if:

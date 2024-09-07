@@ -492,7 +492,7 @@ jobs:
             !./target/*/*.tar.gz
           key: '15-cargo-target-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.profile }}-${{ matrix.job }}-${{ github.sha }}'
   post-build:
-    name: Post Build
+    name: post-build
     runs-on: ubuntu-22.04
     needs:
       - build
