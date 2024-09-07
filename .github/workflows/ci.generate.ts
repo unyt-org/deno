@@ -14,6 +14,8 @@ const macosX86Runner = "macos-13";
 const macosArmRunner = "macos-14";
 
 const settings = {
+  disableCodeSign: true,
+
   disableMacOSX86: true,
 
   disableMacOSArm: false, // Disable for now
@@ -30,7 +32,7 @@ const settings = {
   disableLint: true,
   disableDebug: false,
   disableRelease: false,
-  disableBench: false
+  disableBench: true
 }
 
 const Runners = {
@@ -825,18 +827,18 @@ const ci = {
             "Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.exe -DestinationPath target/release/denort-${{ matrix.arch }}-pc-windows-msvc.zip",
           ].join("\n"),
         },
-        {
-          name: "Autobahn testsuite",
-          if: [
-            "(matrix.os == 'linux' && matrix.arch != 'aarch64') &&",
-            "matrix.job == 'build' &&",
-            "matrix.profile == 'release' &&",
-            "!startsWith(github.ref, 'refs/tags/')",
-          ].join("\n"),
-          run:
-            "target/release/deno run -A --unstable --config tests/config/deno.json ext/websocket/autobahn/fuzzingclient.js",
-        },
         ...(settings.disableTests ? [] : [
+          {
+            name: "Autobahn testsuite",
+            if: [
+              "(matrix.os == 'linux' && matrix.arch != 'aarch64') &&",
+              "matrix.job == 'build' &&",
+              "matrix.profile == 'release' &&",
+              "!startsWith(github.ref, 'refs/tags/')",
+            ].join("\n"),
+            run:
+              "target/release/deno run -A --unstable --config tests/config/deno.json ext/websocket/autobahn/fuzzingclient.js",
+          },
           {
             name: "Test (full, debug)",
             if: [
