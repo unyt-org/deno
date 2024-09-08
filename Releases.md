@@ -6,6 +6,11 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 1.47.1 / 2024.09.08
+
+- Add other ci jobs
+- Fix macos codesign task
+
 ### 1.46.3 / 2024.09.04
 
 - feat(upgrade): print info links for Deno 2 RC releases (#25225)
