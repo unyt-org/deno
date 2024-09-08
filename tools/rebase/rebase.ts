@@ -1,5 +1,8 @@
 #!/usr/bin/env -S deno run -A --lock=tools/deno.lock.json
+// Usage ./rebase.ts <optional release of denoland/deno>
 import Logger from "https://deno.land/x/logger@v1.1.6/logger.ts";
+import * as semver from "https://deno.land/x/semver/mod.ts";
+
 const logger = new Logger();
 
 const GITHUB_BASE_URL = "https://api.github.com/repos";
@@ -28,7 +31,10 @@ const requestGithubAPI = async <T>(route: string, repo = "denoland/deno") => {
 
 const getCommitForRelease = async (repo: string, release: string) => {
 	try {
-		const { type, sha } = (await requestGithubAPI<{ object: { type: "commit" | string, sha: string} }>(`/git/ref/tags/${release}`, repo)).object;
+		const tag = release === "latest" ? 
+			await getLatestTag(repo) :
+			release;
+		const { type, sha } = (await requestGithubAPI<{ object: { type: "commit" | string, sha: string} }>(`/git/ref/tags/${tag}`, repo)).object;
 		const latestHash = type === "commit" ? 
 			sha :
 			(await requestGithubAPI<{ object: { sha: string} }>(`/git/tags/${sha}`, repo)).object.sha;
@@ -43,7 +49,7 @@ const getLatestTag = async (repo?: string) =>
 	(await requestGithubAPI<{ tag_name: string}>(`/releases/latest`, repo)).tag_name;
 
 
-const exec = async (command: string, args: Deno.CommandOptions) =>
+const exec = async (command: string, args: Deno.CommandOptions = {}) =>
 	await new Deno.Command(command.split(" ")[0], { stdout: "inherit", stderr: "inherit", args: command.split(' ').slice(1), ...args})
 		.spawn().output();
 
@@ -55,20 +61,42 @@ const rebaseRepo = async (repo: string, directory: string, commit: string = "ups
 		logger.warn(`Remote upstream for ${repo} does already exist`);
 	}
 	await exec("git fetch upstream", {cwd: directory, stdout: "null"});
-	await exec(`git rebase ${commit}`, {cwd: directory});
+	await exec(`git rebase -X theirs ${commit}`, {cwd: directory});
 	await exec("git rm Cargo.lock", {cwd: directory});
 	await exec("git -c core.editor=true rebase --continue", {cwd: directory});
 
 	logger.info(`Successfully rebased ${repo} to commit ${commit}`);
 }
 
+const getLintReleaseForAstVersion = async (astVersion: string) => {
+	const availableReleases = (await requestGithubAPI<{ tag_name: string }[]>("/releases", "denoland/deno_lint")).map(e => e.tag_name);
+	logger.info(`Found ${availableReleases.length} releases for denoland/deno_lint`);
+	for (const release of availableReleases) {
+		const commit = await getCommitForRelease("denoland/deno_lint", release);
+		const tomlConfig = await (await fetch(`https://raw.githubusercontent.com/denoland/deno_lint/${commit}/Cargo.toml`)).text()
+		const detectedAstVersion = /^deno_ast *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(tomlConfig)?.[1];
+		if (!detectedAstVersion) {
+			logger.warn(`Can not get deno_ast version from ${commit}/Cargo.toml`)
+			continue;
+		};
+		if (semver.gte(astVersion, detectedAstVersion)) {
+			logger.info(`Found astVersion ${astVersion} >= ${detectedAstVersion} on release ${release}`);
+			return release;
+		}
+		else logger.warn(`Wrong ast version on release ${release}. Info: ${detectedAstVersion} > ${astVersion}`);
+	}
+	throw new Error(`Could not find matching lint version for deno_ast ${astVersion}`);
+}
+
+
 /**
  * unyt-org/deno
  */
-const latestDenoTag = await getLatestTag();
-logger.info("Latest deno tag", latestDenoTag);
-const latestDenoCommit = await getCommitForRelease("denoland/deno", latestDenoTag);
+const denoTag = Deno.args[0] ?? "latest";
+logger.info("Migrating to deno tag", denoTag);
+const latestDenoCommit = await getCommitForRelease("denoland/deno", denoTag);
 logger.info("Latest commit hash for denoland/deno", latestDenoCommit);
+
 await rebaseRepo("denoland/deno", "deno", latestDenoCommit);
 
 
@@ -84,21 +112,14 @@ const denoAstCommit = await getCommitForRelease("denoland/deno_ast", denoAstVers
 logger.info("Latest commit hash for deno_ast", denoAstCommit);
 await rebaseRepo("denoland/deno_ast", "deno_ast", denoAstCommit);
 
-
 /**
  * unyt-org/deno_lint
  */
-const latestLintTag = await getLatestTag("denoland/deno_lint");
-logger.info("Latest denoland/deno_lint tag", latestLintTag);
-const latestLintCommit = await getCommitForRelease("denoland/deno_lint", latestLintTag);
-logger.info("Latest commit hash for denoland/deno_lint", latestLintCommit);
-await rebaseRepo("denoland/deno_lint", "deno_lint", latestLintCommit);
-
-const lintCargoConfig = Deno.readTextFileSync("deno_lint/Cargo.toml");
-const denoAstVersion2 = /^deno_ast *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(lintCargoConfig)?.[1];
-
-if (denoAstVersion1 !== denoAstVersion2)
-	throw new Error(`Mismatch between the config version of denoland/deno (${denoAstVersion1}) and denoland/deno_lint (${denoAstVersion2})`)
+const correspondingLintTag = await getLintReleaseForAstVersion(denoAstVersion1);
+logger.info("Corresponding denoland/deno_lint tag", correspondingLintTag);
+const correspondingLintCommit = await getCommitForRelease("denoland/deno_lint", correspondingLintTag);
+logger.info("Corresponding commit hash for denoland/deno_lint", correspondingLintCommit);
+await rebaseRepo("denoland/deno_lint", "deno_lint", correspondingLintCommit);
 
 if (false) {
 	await exec("git push upstream main --force", { cwd: "deno"});
