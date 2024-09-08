@@ -68,4 +68,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.DENOBOT_GIST_PAT }}
           GH_WORKFLOW_ACTOR: ${{ github.actor }}
-        run: ../deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
+        run: cd .. && ./deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
