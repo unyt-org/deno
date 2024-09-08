@@ -23,6 +23,7 @@ jobs:
       - name: Clone unyt-org/deno_ast
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.DENOBOT_GIST_PAT }}
           path: deno_ast
           repository: unyt-org/deno_ast
         
@@ -35,12 +36,14 @@ jobs:
       - name: Clone unyt-org/deno
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.DENOBOT_GIST_PAT }}
           path: deno
           repository: unyt-org/deno
 
       - name: Install deno
         uses: denoland/setup-deno@v1
         with:
+          token: ${{ secrets.DENOBOT_GIST_PAT }}
           deno-version: v1.x
 
       - name: Rebase repository
