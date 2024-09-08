@@ -25,6 +25,7 @@ jobs:
       - name: Clone unyt-org/deno_ast
         uses: actions/checkout@v4
         with:
+          fetch-depth: '0'
           token: ${{ secrets.DENOBOT_GIST_PAT }}
           path: deno_ast
           repository: unyt-org/deno_ast
@@ -32,6 +33,7 @@ jobs:
       - name: Clone unyt-org/deno_lint
         uses: actions/checkout@v4
         with:
+          fetch-depth: '0'
           token: ${{ secrets.DENOBOT_GIST_PAT }}
           path: deno_lint
           repository: unyt-org/deno_lint
@@ -39,6 +41,7 @@ jobs:
       - name: Clone unyt-org/deno
         uses: actions/checkout@v4
         with:
+          fetch-depth: '0'
           token: ${{ secrets.DENOBOT_GIST_PAT }}
           path: deno
           repository: unyt-org/deno
