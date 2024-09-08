@@ -34,11 +34,13 @@ jobs:
 
       - name: Clone unyt-org/deno
         uses: actions/checkout@v4
+        with:
+          path: deno
+          repository: unyt-org/deno
 
       - name: Install deno
         uses: denoland/setup-deno@v1
         with:
-          path: deno
           deno-version: v1.x
 
       - name: Rebase repository
