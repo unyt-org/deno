@@ -38,10 +38,10 @@ jobs:
           version: '21.12'
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
 
-      - name: Publish
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: ./tools/release/03_publish_crates.ts
+      # - name: Publish
+      #   env:
+      #     CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      #   run: ./tools/release/03_publish_crates.ts
 
       - name: Create release tag and check forward commit to main
         env:
