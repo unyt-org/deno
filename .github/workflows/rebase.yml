@@ -11,8 +11,13 @@ on:
 jobs:
   build:
     name: start rebase
-    runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    runs-on: ubuntu-20.04
+    timeout-minutes: 90
+
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: full
+      RUSTC_FORCE_INCREMENTAL: 1
 
     steps:
       - name: Configure git
@@ -22,7 +27,8 @@ jobs:
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git config --global user.name "${{ github.actor }}"
 
-      - uses: dsherret/rust-toolchain-file@v1
+      - name: Install rust toolchain
+        uses: dsherret/rust-toolchain-file@v1
 
       - name: Clone unyt-org/deno_ast
         uses: actions/checkout@v4
