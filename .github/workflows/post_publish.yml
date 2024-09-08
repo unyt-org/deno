@@ -8,7 +8,7 @@ jobs:
   update-dl-version:
     name: update dl.deno.land
     runs-on: ubuntu-22.04
-    if: github.repository == 'denoland/deno'
+    if: github.repository == 'unyt-org/deno'
     steps:
       - name: Notify dl.unyt.org
         run: 'curl ''https://dl.unyt.land/admin/update/${{ secrets.DL_UNYT_TOKEN }}'''
