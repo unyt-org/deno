@@ -94,7 +94,9 @@ const getLintReleaseForAstVersion = async (astVersion: string) => {
  * unyt-org/deno
  */
 logger.info("Migrating to deno tag", denoTag);
-const latestDenoCommit = await getCommitForRelease("denoland/deno", denoTag);
+const latestDenoCommit = denoTag.length == 40 ? 
+	denoTag
+	: await getCommitForRelease("denoland/deno", denoTag);
 logger.info("Latest commit hash for denoland/deno", latestDenoCommit);
 
 await rebaseRepo("denoland/deno", "deno", latestDenoCommit);
@@ -124,11 +126,9 @@ const denoLintCommit = await getCommitForRelease("denoland/deno_lint", denoLintV
 logger.info("Latest commit hash for deno_lint", denoLintCommit);
 await rebaseRepo("denoland/deno_lint", "deno_lint", denoLintCommit);
 
-if (false) {
-	await Promise.all([
-		exec("git push upstream main --force", { cwd: "deno"}),
-		exec("git push upstream main --force", { cwd: "deno_ast"}),
-		exec("git push upstream main --force", { cwd: "deno_lint"})
-	]);
-}
+await Promise.all([
+	exec("git push upstream main --force", { cwd: "deno"}),
+	exec("git push upstream main --force", { cwd: "deno_ast"}),
+	exec("git push upstream main --force", { cwd: "deno_lint"})
+]);
 logger.info("Successfully rebased the core repos");
