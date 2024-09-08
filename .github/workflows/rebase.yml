@@ -27,9 +27,6 @@ jobs:
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git config --global user.name "${{ github.actor }}"
 
-      - name: Install rust toolchain
-        uses: dsherret/rust-toolchain-file@v1
-
       - name: Clone unyt-org/deno_ast
         uses: actions/checkout@v4
         with:
@@ -58,6 +55,14 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+
+      - name: Clone repository
+          uses: actions/checkout@v4
+          with:
+            token: ${{ secrets.DENOBOT_PAT }}
+
+      - name: Install rust toolchain
+        uses: dsherret/rust-toolchain-file@v1
 
       - name: Rebase repository
         env:
