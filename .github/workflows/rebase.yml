@@ -8,6 +8,9 @@ on:
         description: 'The deno release tag to rebase to'
         required: true
         default: 'latest'
+defaults:
+  run:
+    working-directory: ./app
 jobs:
   build:
     name: start rebase
@@ -68,4 +71,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.DENOBOT_GIST_PAT }}
           GH_WORKFLOW_ACTOR: ${{ github.actor }}
-        run: cd .. && ./deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
+        run: ./deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
