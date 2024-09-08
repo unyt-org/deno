@@ -19,7 +19,9 @@ jobs:
         run: |
           git config --global core.symlinks true
           git config --global fetch.parallel 32
-        
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
       - name: Clone unyt-org/deno_ast
         uses: actions/checkout@v4
         with:
@@ -30,6 +32,7 @@ jobs:
       - name: Clone unyt-org/deno_lint
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.DENOBOT_GIST_PAT }}
           path: deno_lint
           repository: unyt-org/deno_lint
 
@@ -43,14 +46,10 @@ jobs:
       - name: Install deno
         uses: denoland/setup-deno@v1
         with:
-          token: ${{ secrets.DENOBOT_GIST_PAT }}
           deno-version: v1.x
 
       - name: Rebase repository
         env:
           GITHUB_TOKEN: ${{ secrets.DENOBOT_GIST_PAT }}
           GH_WORKFLOW_ACTOR: ${{ github.actor }}
-        run: |
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
-          ./deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
+        run: ./deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
