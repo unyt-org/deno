@@ -139,7 +139,7 @@ await Promise.all([
 
 await exec("cargo update", { cwd: "deno"});
 await exec("git add Cargo.lock", { cwd: "deno"});
-await exec("git commit -m \"Dependency bump for Cargo.lock\"", { cwd: "deno"});
+await exec("git commit -m Dependencybump", { cwd: "deno"});
 await exec("git push origin main --force", { cwd: "deno"});
 
 logger.info("Successfully rebased the core repos");
