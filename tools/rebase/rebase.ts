@@ -50,9 +50,11 @@ const getLatestTag = async (repo?: string) =>
 	(await requestGithubAPI<{ tag_name: string}>(`/releases/latest`, repo)).tag_name;
 
 
-const exec = async (command: string, args: Deno.CommandOptions = {}) =>
+const exec = async (command: string, args: Deno.CommandOptions = {}) => {
+	logger.info(`Running command ${command}`, args);
 	await new Deno.Command(command.split(" ")[0], { stdout: "inherit", stderr: "inherit", args: command.split(' ').slice(1), ...args})
 		.spawn().output();
+}
 
 const rebaseRepo = async (repo: string, directory: string, commit: string = "upstream/main") => {
 	logger.info(`Rebasing ${repo} to commit ${commit}...`);
@@ -64,7 +66,7 @@ const rebaseRepo = async (repo: string, directory: string, commit: string = "ups
 	await exec("git fetch upstream", {cwd: directory, stdout: "null"});
 	await exec(`git rebase -X theirs ${commit}`, {cwd: directory});
 	await exec("git rm Cargo.lock", {cwd: directory});
-	await exec("git -c core.editor=true rebase --continue", {cwd: directory});
+	await exec("git -c core.editor=true rebase --continue", {cwd: directory, stdout: "null"});
 
 	logger.info(`Successfully rebased ${repo} to commit ${commit}`);
 }
@@ -125,6 +127,10 @@ logger.info("Using deno_lint version", denoLintVersion);
 const denoLintCommit = await getCommitForRelease("denoland/deno_lint", denoLintVersion);
 logger.info("Latest commit hash for deno_lint", denoLintCommit);
 await rebaseRepo("denoland/deno_lint", "deno_lint", denoLintCommit);
+
+await exec("git status", { cwd: "deno"});
+await exec("git status", { cwd: "deno_ast"});
+await exec("git status", { cwd: "deno_lint"});
 
 await Promise.all([
 	exec("git push origin main --force", { cwd: "deno"}),
