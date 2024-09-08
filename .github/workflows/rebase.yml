@@ -65,9 +65,9 @@ jobs:
       # - name: Install rust toolchain
       #   uses: dsherret/rust-toolchain-file@v1
 
-    - uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: 1.80.1
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.80.1
 
       - name: Rebase repository
         env:
