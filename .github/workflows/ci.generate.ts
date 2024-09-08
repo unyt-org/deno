@@ -5,7 +5,7 @@ import { stringify } from "jsr:@std/yaml@^0.221/stringify";
 // Bump this number when you want to purge the cache.
 // Note: the tools/release/01_bump_crate_versions.ts script will update this version
 // automatically via regex, so ensure that this line maintains this format.
-const cacheVersion = 16;
+const cacheVersion = 17;
 
 const ubuntuX86Runner = "ubuntu-22.04";
 const ubuntuARMRunner = "ubicloud-standard-16-arm";
@@ -26,14 +26,14 @@ const settings = {
 
   /** Disable for now since failure:
    * Uncaught (in promise) TypeError: error sending request from 127.0.0.1:52005 for http://localhost:11111/ (127.0.0.1:11111): client error (SendRequest): connection closed before message completed
-   * await fetch('http://localhost:11111'); */ 
+   * await fetch('http://localhost:11111'); */
   disableTests: true,
 
   disableLint: true,
   disableDebug: false,
   disableRelease: false,
-  disableBench: true
-}
+  disableBench: true,
+};
 
 const Runners = {
   linuxX86: {
@@ -49,7 +49,7 @@ const Runners = {
   macosX86: {
     os: "macos",
     arch: "x86_64",
-    runner: macosX86Runner
+    runner: macosX86Runner,
   },
   macosArm: {
     os: "macos",
@@ -60,7 +60,7 @@ const Runners = {
     os: "windows",
     arch: "x86_64",
     runner: windowsX86Runner,
-  }
+  },
 } as const;
 
 const prCacheKeyPrefix =
@@ -256,7 +256,7 @@ function removeSurroundingExpression(text: string) {
 function handleMatrixItems(items: {
   skip_pr?: string | true;
   skip?: string;
-  disabled?: boolean,
+  disabled?: boolean;
   os: "linux" | "macos" | "windows";
   arch: "x86_64" | "aarch64";
   runner: string;
@@ -283,11 +283,11 @@ function handleMatrixItems(items: {
       let runner =
         "${{ (!contains(github.event.pull_request.labels.*.name, 'ci-full') && (";
       runner += removeSurroundingExpression(item.skip.toString()) + ")) && ";
-      if (item.runner === ubuntuX86Runner)
+      if (item.runner === ubuntuX86Runner) {
         runner += `'${ubuntuX86Runner}' }}`;
-      else runner += `'${ubuntuX86Runner}' || ${
-        removeSurroundingExpression(item.runner)
-      } }}`;
+      } else {runner += `'${ubuntuX86Runner}' || ${
+          removeSurroundingExpression(item.runner)
+        } }}`;}
 
       // deno-lint-ignore no-explicit-any
       (item as any).runner = runner;
@@ -299,22 +299,24 @@ function handleMatrixItems(items: {
     if (
       // os + arch
       (item.os === "windows" && settings.disableWindows) ||
-      (item.os === "linux" && item.arch === "x86_64" && settings.disableLinuxX86) ||
-      (item.os === "linux" && item.arch === "aarch64" && settings.disableLinuxArm) ||
-      (item.os === "macos" && item.arch === "aarch64" && settings.disableMacOSArm) ||
-      (item.os === "macos" && item.arch === "x86_64" && settings.disableMacOSX86) ||
-
+      (item.os === "linux" && item.arch === "x86_64" &&
+        settings.disableLinuxX86) ||
+      (item.os === "linux" && item.arch === "aarch64" &&
+        settings.disableLinuxArm) ||
+      (item.os === "macos" && item.arch === "aarch64" &&
+        settings.disableMacOSArm) ||
+      (item.os === "macos" && item.arch === "x86_64" &&
+        settings.disableMacOSX86) ||
       // profile
       (item.profile === "debug" && settings.disableDebug) ||
       (item.profile === "release" && settings.disableRelease) ||
-
       // job
       (item.job === "lint" && settings.disableLint) ||
       (item.job === "bench" && settings.disableBench)
     ) item.disabled = true;
 
     return { ...item };
-  }).filter(e => !e.disabled);
+  }).filter((e) => !e.disabled);
 }
 
 const ci = {
@@ -734,9 +736,9 @@ const ci = {
           ].join("\n"),
           run: [
             "echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'",
-            "echo 'Artifact version is ${{ github.event.pull_request.title }}'"
+            "echo 'Artifact version is ${{ github.event.pull_request.title }}'",
             // TODO
-          ].join("\n")
+          ].join("\n"),
         },
         {
           name: "Pre-release (linux)",
@@ -773,7 +775,7 @@ const ci = {
               "--code-signature-flags=runtime " +
               '--p12-password="$APPLE_CODESIGN_PASSWORD" ' +
               "--p12-file=<(echo $APPLE_CODESIGN_KEY | base64 -d) " +
-              "--entitlements-xml-file=cli/entitlements.plist"
+              "--entitlements-xml-file=cli/entitlements.plist",
             ]),
             "cd target/release",
             "zip -r deno-${{ matrix.arch }}-apple-darwin.zip deno",
@@ -880,7 +882,7 @@ const ci = {
               "                            --json=wpt.json               \\",
               "                            --wptreport=wptreport.json",
             ].join("\n"),
-          }
+          },
         ]),
         // {
         //   name: "Upload wpt results to dl.deno.land",
