@@ -122,8 +122,10 @@ logger.info("Corresponding commit hash for denoland/deno_lint", correspondingLin
 await rebaseRepo("denoland/deno_lint", "deno_lint", correspondingLintCommit);
 
 if (false) {
-	await exec("git push upstream main --force", { cwd: "deno"});
-	await exec("git push upstream main --force", { cwd: "deno_ast"});
-	await exec("git push upstream main --force", { cwd: "deno_lint"});
+	await Promise.all([
+		exec("git push upstream main --force", { cwd: "deno"}),
+		exec("git push upstream main --force", { cwd: "deno_ast"}),
+		exec("git push upstream main --force", { cwd: "deno_lint"})
+	]);
 }
 logger.info("Successfully rebased the core repos");

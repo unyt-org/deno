@@ -2,7 +2,7 @@
 *.pyc
 *.swp
 .env
-
+tools/rebase/tools/deno.lock.json
 /.cargo_home/
 /.idea/
 /.vs/
