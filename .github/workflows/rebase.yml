@@ -19,27 +19,30 @@ jobs:
         run: |
           git config --global core.symlinks true
           git config --global fetch.parallel 32
-
-      - name: Clone unyt-org/deno
-        uses: actions/checkout@v4
         
       - name: Clone unyt-org/deno_ast
         uses: actions/checkout@v4
         with:
+          path: deno_ast
           repository: unyt-org/deno_ast
         
       - name: Clone unyt-org/deno_lint
         uses: actions/checkout@v4
         with:
+          path: deno_lint
           repository: unyt-org/deno_lint
+
+      - name: Clone unyt-org/deno
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
         with:
+          path: deno
           deno-version: v1.x
 
       - name: Rebase repository
         env:
           GITHUB_TOKEN: ${{ secrets.DENOBOT_GIST_PAT }}
           GH_WORKFLOW_ACTOR: ${{ github.actor }}
-        run: ./tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
+        run: ./deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
