@@ -704,7 +704,7 @@ fn select_specific_version_for_upgrade(
         version_or_hash: version,
         release_channel,
       }))
-    },
+    }
     _ => unreachable!(),
   }
 }
@@ -847,8 +847,8 @@ fn get_download_url(
   let download_url = match release_channel {
     ReleaseChannel::Stable => {
       format!("{}/download/v{}/{}", RELEASE_URL, version, *ARCHIVE_NAME)
-    },
-    _ => unreachable!()
+    }
+    _ => unreachable!(),
   };
 
   Url::parse(&download_url).with_context(|| {
@@ -1042,9 +1042,7 @@ mod test {
   use super::*;
 
   #[test]
-  fn test_requested_version() {
-    
-  }
+  fn test_requested_version() {}
 
   #[test]
   fn test_parse_upgrade_check_file() {
@@ -1084,9 +1082,7 @@ mod test {
   }
 
   #[test]
-  fn test_serialize_upgrade_check_file() {
-    
-  }
+  fn test_serialize_upgrade_check_file() {}
 
   #[derive(Clone)]
   struct TestUpdateCheckerEnvironment {
@@ -1323,9 +1319,7 @@ mod test {
   }
 
   #[test]
-  fn test_get_latest_version_url() {
-    
-  }
+  fn test_get_latest_version_url() {}
 
   #[test]
   fn test_normalize_version_server() {
