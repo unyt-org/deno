@@ -10,7 +10,7 @@ on:
         default: 'latest'
 jobs:
   build:
-    name: start release
+    name: start rebase
     runs-on: ubuntu-22.04
     timeout-minutes: 30
 
