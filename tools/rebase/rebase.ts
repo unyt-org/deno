@@ -81,12 +81,12 @@ const getLintReleaseForAstVersion = async (astVersion: string) => {
 			continue;
 		};
 		if (semver.gte(astVersion, detectedAstVersion)) {
-			logger.info(`Found astVersion ${astVersion} >= ${detectedAstVersion} on release ${release}`);
+			logger.info(`Found astVersion ${astVersion} >= ${detectedAstVersion} on release ${release} of deno_lint`);
 			return release;
 		}
-		else logger.warn(`Wrong ast version on release ${release}. Info: ${detectedAstVersion} > ${astVersion}`);
+		else logger.warn(`Wrong ast version on release ${release} of deno_lint. Info: ${detectedAstVersion} > ${astVersion}`);
 	}
-	throw new Error(`Could not find matching lint version for deno_ast ${astVersion}`);
+	throw new Error(`Could not find matching lint version for deno_ast ${astVersion} in  deno_lint`);
 }
 
 
@@ -104,22 +104,25 @@ await rebaseRepo("denoland/deno", "deno", latestDenoCommit);
  * unyt-org/deno_ast
  */
 const denoCargoConfig = Deno.readTextFileSync("deno/Cargo.toml");
-const denoAstVersion1 = /^deno_ast *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(denoCargoConfig)?.[1];
-if (!denoAstVersion1)
+const denoAstVersion = /^deno_ast *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(denoCargoConfig)?.[1];
+if (!denoAstVersion)
 	throw new Error("Can not get deno_ast version from Cargo.toml");
-logger.info("Using deno_ast version", denoAstVersion1);
-const denoAstCommit = await getCommitForRelease("denoland/deno_ast", denoAstVersion1);
+logger.info("Using deno_ast version", denoAstVersion);
+const denoAstCommit = await getCommitForRelease("denoland/deno_ast", denoAstVersion);
 logger.info("Latest commit hash for deno_ast", denoAstCommit);
 await rebaseRepo("denoland/deno_ast", "deno_ast", denoAstCommit);
 
 /**
  * unyt-org/deno_lint
  */
-const correspondingLintTag = await getLintReleaseForAstVersion(denoAstVersion1);
-logger.info("Corresponding denoland/deno_lint tag", correspondingLintTag);
-const correspondingLintCommit = await getCommitForRelease("denoland/deno_lint", correspondingLintTag);
-logger.info("Corresponding commit hash for denoland/deno_lint", correspondingLintCommit);
-await rebaseRepo("denoland/deno_lint", "deno_lint", correspondingLintCommit);
+const denoCLICargoConfig = Deno.readTextFileSync("deno/cli/Cargo.toml");
+const denoLintVersion = /^deno_lint *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(denoCLICargoConfig)?.[1];
+if (!denoLintVersion)
+	throw new Error("Can not get deno_lint version from Cargo.toml");
+logger.info("Using deno_lint version", denoLintVersion);
+const denoLintCommit = await getCommitForRelease("denoland/deno_lint", denoLintVersion);
+logger.info("Latest commit hash for deno_lint", denoLintCommit);
+await rebaseRepo("denoland/deno_lint", "deno_lint", denoLintCommit);
 
 if (false) {
 	await Promise.all([
