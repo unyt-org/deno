@@ -57,9 +57,9 @@ jobs:
           deno-version: v1.x
 
       - name: Clone repository
-          uses: actions/checkout@v4
-          with:
-            token: ${{ secrets.DENOBOT_PAT }}
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.DENOBOT_PAT }}
 
       - name: Install rust toolchain
         uses: dsherret/rust-toolchain-file@v1
