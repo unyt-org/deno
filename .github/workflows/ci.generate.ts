@@ -16,13 +16,13 @@ const macosArmRunner = "macos-14";
 const settings = {
   disableCodeSign: true,
 
-  disableMacOSX86: true,
+  disableMacOSX86: false,
 
-  disableMacOSArm: false, // Disable for now
+  disableMacOSArm: false,
   disableLinuxX86: false,
 
-  disableLinuxArm: true,
-  disableWindows: true,
+  disableLinuxArm: false,
+  disableWindows: false,
 
   /** Disable for now since failure:
    * Uncaught (in promise) TypeError: error sending request from 127.0.0.1:52005 for http://localhost:11111/ (127.0.0.1:11111): client error (SendRequest): connection closed before message completed
