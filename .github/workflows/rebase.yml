@@ -1,0 +1,45 @@
+name: ci
+permissions:
+  contents: write
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The deno release tag to rebase to'
+        required: true
+        default: 'latest'
+jobs:
+  build:
+    name: start release
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Configure git
+        run: |
+          git config --global core.symlinks true
+          git config --global fetch.parallel 32
+
+      - name: Clone unyt-org/deno
+        uses: actions/checkout@v4
+        
+      - name: Clone unyt-org/deno_ast
+        uses: actions/checkout@v4
+        with:
+          repository: unyt-org/deno_ast
+        
+      - name: Clone unyt-org/deno_lint
+        uses: actions/checkout@v4
+        with:
+          repository: unyt-org/deno_lint
+
+      - name: Install deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Rebase repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.DENOBOT_GIST_PAT }}
+          GH_WORKFLOW_ACTOR: ${{ github.actor }}
+        run: ./tools/rebase/rebase.ts ${{ github.event.inputs.tag }}

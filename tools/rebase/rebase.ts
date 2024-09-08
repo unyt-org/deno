@@ -7,8 +7,9 @@ const logger = new Logger();
 
 const GITHUB_BASE_URL = "https://api.github.com/repos";
 const GITHUB_TOKEN = Deno.env.get("GITHUB_TOKEN");
+const denoTag = Deno.args[0] ?? "latest";
 
-logger.info("Starting rebase action...");
+logger.info(`Starting rebase action to release ${denoTag}...`);
 !GITHUB_TOKEN && logger.warn("No GITHUB_TOKEN configured: You may want to add the token as repository secret.");
 
 const requestGithubAPI = async <T>(route: string, repo = "denoland/deno") => {
@@ -92,7 +93,6 @@ const getLintReleaseForAstVersion = async (astVersion: string) => {
 /**
  * unyt-org/deno
  */
-const denoTag = Deno.args[0] ?? "latest";
 logger.info("Migrating to deno tag", denoTag);
 const latestDenoCommit = await getCommitForRelease("denoland/deno", denoTag);
 logger.info("Latest commit hash for denoland/deno", latestDenoCommit);
