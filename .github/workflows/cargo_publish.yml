@@ -38,6 +38,7 @@ jobs:
           version: '21.12'
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
 
+      # FIXME
       # - name: Publish
       #   env:
       #     CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
