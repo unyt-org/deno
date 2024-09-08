@@ -35,7 +35,7 @@ jobs:
           token: ${{ secrets.DENOBOT_GIST_PAT }}
           path: deno_ast
           repository: unyt-org/deno_ast
-        
+
       - name: Clone unyt-org/deno_lint
         uses: actions/checkout@v4
         with:

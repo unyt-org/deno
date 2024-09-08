@@ -5,17 +5,22 @@ const logger = new Logger();
 logger.info("Starting reset action...");
 
 const exec = async (command: string, args: Deno.CommandOptions = {}) =>
-	await new Deno.Command(command.split(" ")[0], { stdout: "inherit", stderr: "inherit", args: command.split(' ').slice(1), ...args})
-		.spawn().output();
+  await new Deno.Command(command.split(" ")[0], {
+    stdout: "inherit",
+    stderr: "inherit",
+    args: command.split(" ").slice(1),
+    ...args,
+  })
+    .spawn().output();
 
 await exec("rm -rf deno");
 await exec("rm -rf deno_ast");
 await exec("rm -rf deno_lint");
 
 await Promise.all([
-	exec("git clone https://github.com/unyt-org/deno"),
-	exec("git clone https://github.com/unyt-org/deno_ast"),
-	exec("git clone https://github.com/unyt-org/deno_lint")
+  exec("git clone https://github.com/unyt-org/deno"),
+  exec("git clone https://github.com/unyt-org/deno_ast"),
+  exec("git clone https://github.com/unyt-org/deno_lint"),
 ]);
 
 logger.info("Finished reset");
