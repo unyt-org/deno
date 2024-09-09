@@ -98,17 +98,6 @@ jobs:
             job: build
             profile: debug
             use_sysroot: true
-          - os: linux
-            arch: aarch64
-            runner: ubicloud-standard-16-arm
-            job: build
-            profile: debug
-          - os: linux
-            arch: aarch64
-            runner: ubicloud-standard-16-arm
-            job: build
-            profile: release
-            use_sysroot: true
       fail-fast: '${{ github.event_name == ''pull_request'' || (github.ref != ''refs/heads/main'' && !startsWith(github.ref, ''refs/tags/'')) }}'
     env:
       CARGO_TERM_COLOR: always
