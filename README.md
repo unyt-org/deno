@@ -15,35 +15,26 @@ defaults and a great developer experience. It's built on [V8](https://v8.dev/),
 Learn more about the Deno runtime
 [in the documentation](https://docs.deno.com/runtime/manual).
 
+> ![NOTE]
+> This is a fork of the original Deno runtime (https://github.com/denoland/deno) created by [unyt.org](https://unyt.org),
+> which extends Deno with a custom JSX template syntax ([JUSIX](https://github.com/unyt-org/jusix)).
+> This modified Deno runtime is intended to be used in combination with the [UIX framwork](https://uix.unyt.org/).
+> Huge shoutout to the Deno team for making this possible by providing the Deno open source project!
+ 
 ## Installation
 
-Install the Deno runtime on your system using one of the commands below. Note
-that there are a number of ways to install Deno - a comprehensive list of
-installation options can be found
-[here](https://docs.deno.com/runtime/manual/getting_started/installation).
+Install the Deno runtime on your system using one of the commands below.
 
 Shell (Mac, Linux):
 
 ```sh
-curl -fsSL https://deno.land/install.sh | sh
+curl -fsSL https://unyt.land/install.sh | sh
 ```
 
 PowerShell (Windows):
 
 ```powershell
-irm https://deno.land/install.ps1 | iex
-```
-
-[Homebrew](https://formulae.brew.sh/formula/deno) (Mac):
-
-```sh
-brew install deno
-```
-
-[Chocolatey](https://chocolatey.org/packages/deno) (Windows):
-
-```powershell
-choco install deno
+irm https://unyt.land/install.ps1 | iex
 ```
 
 ### Build and install from source
