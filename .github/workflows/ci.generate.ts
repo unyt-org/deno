@@ -21,7 +21,7 @@ const settings = {
   disableMacOSArm: false,
   disableLinuxX86: false,
 
-  disableLinuxArm: false,
+  disableLinuxArm: true, // No runner
   disableWindows: false,
 
   /** Disable for now since failure:
