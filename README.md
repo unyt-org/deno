@@ -28,7 +28,7 @@ Install the Deno runtime on your system using one of the commands below.
 Shell (Mac, Linux):
 
 ```sh
-curl -fsSL https://unyt.land/install.sh | sh
+curl -fsSL https://unyt.land/install.sh | bash
 ```
 
 PowerShell (Windows):
