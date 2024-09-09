@@ -15,7 +15,7 @@ defaults and a great developer experience. It's built on [V8](https://v8.dev/),
 Learn more about the Deno runtime
 [in the documentation](https://docs.deno.com/runtime/manual).
 
-> ![NOTE]
+> [!NOTE]
 > This is a fork of the original Deno runtime (https://github.com/denoland/deno) created by [unyt.org](https://unyt.org),
 > which extends Deno with a custom JSX template syntax ([JUSIX](https://github.com/unyt-org/jusix)).
 > This modified Deno runtime is intended to be used in combination with the [UIX framwork](https://uix.unyt.org/).
