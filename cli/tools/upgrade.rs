@@ -465,7 +465,10 @@ pub async fn upgrade(
   let requested_version =
     RequestedVersion::from_upgrade_flags(upgrade_flags.clone())?;
 
-  log::info!("Current Deno for UIX version: v{}", version::DENO_VERSION_INFO.deno);
+  log::info!(
+    "Current Deno for UIX version: v{}",
+    version::DENO_VERSION_INFO.deno
+  );
 
   let maybe_selected_version_to_upgrade = match &requested_version {
     RequestedVersion::Latest(channel) => {
@@ -826,9 +829,7 @@ fn get_latest_version_url(
 ) -> String {
   let file_name = match release_channel {
     ReleaseChannel::Stable => Cow::Borrowed("release-latest.txt"),
-    ReleaseChannel::Canary => {
-      Cow::Owned(format!("canary-latest.txt"))
-    }
+    ReleaseChannel::Canary => Cow::Owned(format!("canary-latest.txt")),
     _ => unreachable!(),
   };
   let query_param = match check_kind {
@@ -853,10 +854,16 @@ fn get_download_url(
 ) -> Result<Url, AnyError> {
   let download_url = match release_channel {
     ReleaseChannel::Stable => {
-      format!("{}/download/v{}/{}?raw", RELEASE_URL, version, *ARCHIVE_NAME)
+      format!(
+        "{}/download/v{}/{}?raw",
+        RELEASE_URL, version, *ARCHIVE_NAME
+      )
     }
     ReleaseChannel::Canary => {
-      format!("{}/download/canary-{}/{}?raw", RELEASE_URL, version, *ARCHIVE_NAME)
+      format!(
+        "{}/download/canary-{}/{}?raw",
+        RELEASE_URL, version, *ARCHIVE_NAME
+      )
     }
     _ => unreachable!(),
   };
@@ -1464,7 +1471,5 @@ mod test {
   }
 
   #[test]
-  fn blog_post_links() {
-    
-  }
+  fn blog_post_links() {}
 }

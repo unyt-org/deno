@@ -6,6 +6,19 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 1.47.2 / 2024.09.10
+
+- Add deno_uix logo
+- Allow canary uix for deno installation
+- Disable linux aarch64 build pipeline
+- Enable apple code sign
+- Fix note in README.md
+- Fix post publish notify
+- Fix post publish notify
+- Update README.md
+- Update README.md
+- Update logo in README.md
+
 ### 1.47.1 / 2024.09.08
 
 - Add other ci jobs
