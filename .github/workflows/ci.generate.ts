@@ -765,13 +765,15 @@ const ci = {
             "github.repository == 'unyt-org/deno'",
           ].join("\n"),
           env: {
-            "APPLE_CODESIGN_KEY": "${{ secrets.APPLE_CODESIGN_KEY }}"
+            "APPLE_CODESIGN_KEY": "${{ secrets.APPLE_CODESIGN_KEY }}",
+            "APPLE_CODESIGN_PASSWORD": "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
           },
           run: [
             ...(settings.disableCodeSign ? [] : [
               'echo "Key is $(echo $APPLE_CODESIGN_KEY | base64 -d | wc -c) bytes"',
               "rcodesign sign target/release/deno " +
               "--code-signature-flags=runtime " +
+              '--p12-password="$APPLE_CODESIGN_PASSWORD" ' +
               "--p12-file=<(echo $APPLE_CODESIGN_KEY | base64 -d) " +
               "--entitlements-xml-file=cli/entitlements.plist",
             ]),
