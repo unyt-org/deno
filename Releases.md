@@ -6,6 +6,11 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 1.48.0 / 2024.09.24
+
+- Fix apple code sign
+- Fix apple code sign
+
 ### 1.47.2 / 2024.09.10
 
 - Add deno_uix logo
