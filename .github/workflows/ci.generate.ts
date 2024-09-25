@@ -770,6 +770,7 @@ const ci = {
           run: [
             ...(settings.disableCodeSign ? [] : [
               'echo "Key is $(echo $APPLE_CODESIGN_KEY | base64 -d | wc -c) bytes"',
+              'echo "Password is $(echo $APPLE_CODESIGN_PASSWORD | base64 -d | wc -c) bytes"',
               "rcodesign sign target/release/deno " +
               "--code-signature-flags=runtime " +
               '--p12-password="$APPLE_CODESIGN_PASSWORD" ' +
