@@ -5,7 +5,7 @@ import { stringify } from "jsr:@std/yaml@^0.221/stringify";
 // Bump this number when you want to purge the cache.
 // Note: the tools/release/01_bump_crate_versions.ts script will update this version
 // automatically via regex, so ensure that this line maintains this format.
-const cacheVersion = 18;
+const cacheVersion = 19;
 
 const ubuntuX86Runner = "ubuntu-22.04";
 const ubuntuARMRunner = "ubicloud-standard-16-arm";
@@ -766,10 +766,12 @@ const ci = {
           ].join("\n"),
           env: {
             "APPLE_CODESIGN_KEY": "${{ secrets.APPLE_CODESIGN_KEY }}",
+            "APPLE_CODESIGN_PASSWORD": "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
           },
           run: [
             ...(settings.disableCodeSign ? [] : [
               'echo "Key is $(echo $APPLE_CODESIGN_KEY | base64 -d | wc -c) bytes"',
+              'echo "Password is $(echo $APPLE_CODESIGN_PASSWORD | base64 -d | wc -c) bytes"',
               "rcodesign sign target/release/deno " +
               "--code-signature-flags=runtime " +
               '--p12-password="$APPLE_CODESIGN_PASSWORD" ' +
