@@ -398,6 +398,7 @@ jobs:
           github.repository == 'unyt-org/deno')
         env:
           APPLE_CODESIGN_KEY: '${{ secrets.APPLE_CODESIGN_KEY }}'
+          APPLE_CODESIGN_PASSWORD: '${{ secrets.APPLE_CODESIGN_PASSWORD }}'
         run: |-
           echo "Key is $(echo $APPLE_CODESIGN_KEY | base64 -d | wc -c) bytes"
           echo "Password is $(echo $APPLE_CODESIGN_PASSWORD | base64 -d | wc -c) bytes"

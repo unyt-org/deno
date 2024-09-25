@@ -766,6 +766,7 @@ const ci = {
           ].join("\n"),
           env: {
             "APPLE_CODESIGN_KEY": "${{ secrets.APPLE_CODESIGN_KEY }}",
+            "APPLE_CODESIGN_PASSWORD": "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
           },
           run: [
             ...(settings.disableCodeSign ? [] : [
