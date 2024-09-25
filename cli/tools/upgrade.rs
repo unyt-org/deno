@@ -36,8 +36,6 @@ use std::time::Duration;
 
 const RELEASE_URL: &str = "https://dl.unyt.land";
 
-static EXAMPLE_USAGE: &str = cstr!("Example usage:\n  <p(245)>deno upgrade | deno upgrade 1.46 | deno upgrade canary</>");
-
 pub static ARCHIVE_NAME: Lazy<String> =
   Lazy::new(|| format!("deno-{}.zip", env!("TARGET")));
 
@@ -641,45 +639,20 @@ fn select_specific_version_for_upgrade(
   version: String,
   force: bool,
 ) -> Result<Option<AvailableVersion>, AnyError> {
-  match release_channel {
-    ReleaseChannel::Stable => {
-      let current_is_passed = if version::DENO_VERSION_INFO.release_channel
-        != ReleaseChannel::Canary
-      {
-        version::DENO_VERSION_INFO.deno == version
-      } else {
-        false
-      };
-
-      if !force && current_is_passed {
-        log::info!(
-          "Version {} is already installed",
-          version::DENO_VERSION_INFO.deno
-        );
-        return Ok(None);
-      }
-
-      Ok(Some(AvailableVersion {
-        version_or_hash: version,
-        release_channel,
-      }))
+  let current_is_passed = match release_channel {
+    ReleaseChannel::Stable | ReleaseChannel::Rc | ReleaseChannel::Lts => {
+      version::DENO_VERSION_INFO.release_channel == release_channel
+        && version::DENO_VERSION_INFO.deno == version
     }
-    ReleaseChannel::Canary => {
-      let current_is_passed = version::DENO_VERSION_INFO.git_hash == version;
-      if !force && current_is_passed {
-        log::info!(
-          "Version {} is already installed",
-          version::DENO_VERSION_INFO.deno
-        );
-        return Ok(None);
-      }
+    ReleaseChannel::Canary => version::DENO_VERSION_INFO.git_hash == version,
+  };
 
-      Ok(Some(AvailableVersion {
-        version_or_hash: version,
-        release_channel,
-      }))
-    }
-    _ => unreachable!(),
+  if !force && current_is_passed {
+    log::info!(
+      "Version {} is already installed",
+      version::DENO_VERSION_INFO.deno
+    );
+    return Ok(None);
   }
 
   Ok(Some(AvailableVersion {
