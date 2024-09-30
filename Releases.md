@@ -6,6 +6,10 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 1.49.0 / 2024.09.30
+
+- Merge pull request #13 from unyt-org/release_1_48.0
+
 ### 1.47.2 / 2024.09.10
 
 - Add deno_uix logo
