@@ -6,6 +6,10 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 1.50.0 / 2024.10.02
+
+- Use latest deno_ast
+
 ### 1.49.0 / 2024.09.30
 
 - Merge pull request #13 from unyt-org/release_1_48.0
