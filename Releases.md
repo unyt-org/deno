@@ -6,6 +6,10 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 1.52.0 / 2024.10.07
+
+- Merge pull request #16 from unyt-org/release_1_51.0
+
 ### 1.51.0 / 2024.10.07
 
 - fix Cargo.lock
