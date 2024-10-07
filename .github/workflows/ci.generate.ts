@@ -373,7 +373,7 @@ const ci = {
       needs: ["pre_build"],
       if: "${{ needs.pre_build.outputs.skip_build != 'true' }}",
       "runs-on": "${{ matrix.runner }}",
-      "timeout-minutes": 150,
+      "timeout-minutes": 250,
       defaults: {
         run: {
           // GH actions does not fail fast by default on
