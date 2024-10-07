@@ -6,6 +6,14 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 1.51.0 / 2024.10.07
+
+- fix Cargo.lock
+- update Cargo.lock (deno_ast)
+- update Cargo.lock (deno_ast)
+- update Cargo.lock (deno_ast)
+- update Cargo.lock (deno_ast)
+
 ### 1.50.0 / 2024.10.02
 
 - Use latest deno_ast
