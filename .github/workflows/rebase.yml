@@ -1,0 +1,76 @@
+name: rebase
+permissions:
+  contents: write
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The deno release tag to rebase to'
+        required: true
+        default: 'latest'
+
+jobs:
+  build:
+    name: start rebase
+    runs-on: ubuntu-20.04
+    timeout-minutes: 90
+
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: full
+      RUSTC_FORCE_INCREMENTAL: 1
+
+    steps:
+      - name: Configure git
+        run: |
+          git config --global core.symlinks true
+          git config --global fetch.parallel 32
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Clone unyt-org/deno_ast
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          token: ${{ secrets.DENOBOT_GIST_PAT }}
+          path: deno_ast
+          repository: unyt-org/deno_ast
+
+      - name: Clone unyt-org/deno_lint
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          token: ${{ secrets.DENOBOT_GIST_PAT }}
+          path: deno_lint
+          repository: unyt-org/deno_lint
+
+      - name: Clone unyt-org/deno
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          token: ${{ secrets.DENOBOT_GIST_PAT }}
+          path: deno
+          repository: unyt-org/deno
+
+      - name: Install deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      # - name: Clone repository
+      #   uses: actions/checkout@v4
+      #   with:
+      #     token: ${{ secrets.DENOBOT_PAT }}
+
+      # - name: Install rust toolchain
+      #   uses: dsherret/rust-toolchain-file@v1
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.80.1
+
+      - name: Rebase repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.DENOBOT_GIST_PAT }}
+          GH_WORKFLOW_ACTOR: ${{ github.actor }}
+        run: ./deno/tools/rebase/rebase.ts ${{ github.event.inputs.tag }}
