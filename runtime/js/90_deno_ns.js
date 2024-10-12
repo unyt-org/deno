@@ -69,10 +69,8 @@ const denoNs = {
   renameSync: fs.renameSync,
   rename: fs.rename,
   version: version.version,
-  build: {
-    ...core.build,
-    uix: true
-  },
+  build: core.build,
+  uix: true,
   statSync: fs.statSync,
   lstatSync: fs.lstatSync,
   stat: fs.stat,

@@ -4352,6 +4352,11 @@ declare namespace Deno {
     env?: string;
   };
 
+  /**
+   * Indicates that this is a custom Deno build for UIX.
+   */
+  export const uix: true
+
   /** Version information related to the current Deno CLI runtime environment.
    *
    * Users are discouraged from code branching based on this information, as
