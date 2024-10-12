@@ -45,7 +45,7 @@ jobs:
 
       - name: Run version bump
         run: |
-          git remote add upstream https://github.com/denoland/deno
+          git remote add upstream https://github.com/unyt-org/deno
           ./tools/release/01_bump_crate_versions.ts --${{github.event.inputs.releaseKind}}
 
       - name: Create PR
