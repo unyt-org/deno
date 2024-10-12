@@ -475,19 +475,7 @@ opt-level = 3
 opt-level = 3
 [profile.release.package.zstd-sys]
 opt-level = 3
-[profile.release.package.http]
-opt-level = 3
-[profile.release.package.http-body]
-opt-level = 3
-[profile.release.package.httparse]
-opt-level = 3
-[profile.release.package.mio]
-opt-level = 3
-[profile.release.package.fnv]
-opt-level = 3
-[profile.release.package.hyper-util]
-opt-level = 3
-[profile.release.package.httpdate]
-opt-level = 3
-[profile.release.package.deno_unsync]
-opt-level = 3
+
+[patch.crates-io]
+deno_ast = { git = "https://github.com/unyt-org/deno_ast.git" }
+deno_lint = { git = "https://github.com/unyt-org/deno_lint.git" }
