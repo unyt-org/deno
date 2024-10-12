@@ -43,7 +43,7 @@ exclude = ["tests/util/std/hash/_wasm"]
 authors = ["the Deno authors"]
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/denoland/deno"
+repository = "https://github.com/unyt-org/deno"
 
 [workspace.dependencies]
 deno_ast = { version = "=0.43.3", features = ["transpiling"] }
