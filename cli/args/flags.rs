@@ -1562,8 +1562,8 @@ fn handle_repl_flags(flags: &mut Flags, repl_flags: ReplFlags) {
 
 pub fn clap_root() -> Command {
   let long_version = format!(
-    "{} ({}, {}, {})\nv8 {}\ntypescript {}",
-    crate::version::DENO_VERSION_INFO.deno.replace("deno", "deno/uix"),
+    "for uix {} ({}, {}, {})\nv8 {}\ntypescript {}",
+    crate::version::DENO_VERSION_INFO.deno,
     crate::version::DENO_VERSION_INFO.release_channel.name(),
     env!("PROFILE"),
     env!("TARGET"),
