@@ -42,7 +42,7 @@ exclude = ["tests/util/std/hash/_wasm"]
 authors = ["the Deno authors"]
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/denoland/deno"
+repository = "https://github.com/unyt-org/deno"
 
 [workspace.dependencies]
 deno_ast = { version = "=0.42.1", features = ["transpiling"] }
@@ -203,7 +203,7 @@ webpki-root-certs = "0.26.5"
 webpki-roots = "0.26"
 which = "4.2.5"
 yoke = { version = "0.7.4", features = ["derive"] }
-zeromq = { version = "=0.4.0", default-features = false, features = ["tcp-transport", "tokio-runtime"] }
+zeromq = { version = "=0.4.1", default-features = false, features = ["tcp-transport", "tokio-runtime"] }
 zstd = "=0.12.4"
 
 # crypto
