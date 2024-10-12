@@ -6,24 +6,9 @@ on:
 
 jobs:
   update-dl-version:
-    name: update dl.deno.land version
-    runs-on: ubuntu-24.04
-    if: github.repository == 'denoland/deno'
+    name: update dl.deno.land
+    runs-on: ubuntu-22.04
+    if: github.repository == 'unyt-org/deno'
     steps:
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          project_id: denoland
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-          export_environment_variables: true
-          create_credentials_file: true
-
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: denoland
-
-      - name: Upload version file to dl.deno.land
-        run: |
-          echo ${GITHUB_REF#refs/*/} > release-latest.txt
-          gsutil -h "Cache-Control: no-cache" cp release-latest.txt gs://dl.deno.land/release-latest.txt
+      - name: Notify dl.unyt.org
+        run: 'curl ''https://dl.unyt.land/admin/update/${{ secrets.DL_UNYT_TOKEN }}'''
