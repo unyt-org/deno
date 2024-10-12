@@ -152,6 +152,7 @@ impl LintRule for NoSloppyImportsRule {
             .unwrap_or_default(),
           hint: None,
           info: vec![],
+          severity: None,
         },
       );
     }

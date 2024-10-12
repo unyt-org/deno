@@ -56,10 +56,8 @@ impl PackageLintRule for NoSlowTypesRule {
             .map(|info| Cow::Owned(info.to_string()))
             .collect(),
           fixes: vec![],
-          custom_docs_url: d
-            .docs_url()
-            .map(|u| LintDocsUrl::Custom(u.into_owned()))
-            .unwrap_or_default(),
+          custom_docs_url: d.docs_url().map(|u| u.into_owned()),
+          severity: None,
         },
       })
       .collect()
