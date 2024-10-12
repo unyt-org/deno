@@ -1,10 +1,10 @@
-# Deno
+# Deno for UIX
 
 [![](https://img.shields.io/crates/v/deno.svg)](https://crates.io/crates/deno)
 [![Twitter badge][]][Twitter link] [![Discord badge][]][Discord link]
 [![YouTube badge][]][YouTube link]
 
-<img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain">
+<img align="right" src="./deno_uix.svg" height="150px" alt="the deno mascot dinosaur standing in the rain">
 
 [Deno](https://deno.com)
 ([/ˈdiːnoʊ/](https://ipa-reader.com/?text=%CB%88di%CB%90no%CA%8A), pronounced
@@ -14,6 +14,14 @@ defaults and a great developer experience. It's built on [V8](https://v8.dev/),
 
 Learn more about the Deno runtime
 [in the documentation](https://docs.deno.com/runtime/manual).
+
+> [!NOTE]
+> This is a fork of the original Deno runtime (https://github.com/denoland/deno)
+> created by [unyt.org](https://unyt.org), which extends Deno with a custom JSX
+> template syntax ([JUSIX](https://github.com/unyt-org/jusix)). This modified
+> Deno runtime is intended to be used in combination with the
+> [UIX framwork](https://uix.unyt.org/). Huge shoutout to the Deno team for
+> making this possible by providing the Deno open source project!
 
 ## Installation
 
@@ -25,37 +33,14 @@ installation options can be found
 Shell (Mac, Linux):
 
 ```sh
-curl -fsSL https://deno.land/install.sh | sh
+curl -fsSL https://unyt.land/install.sh | sh
 ```
 
 PowerShell (Windows):
 
 ```powershell
-irm https://deno.land/install.ps1 | iex
+irm https://unyt.land/install.ps1 | iex
 ```
-
-[Homebrew](https://formulae.brew.sh/formula/deno) (Mac):
-
-```sh
-brew install deno
-```
-
-[Chocolatey](https://chocolatey.org/packages/deno) (Windows):
-
-```powershell
-choco install deno
-```
-
-[WinGet](https://winstall.app/apps/DenoLand.Deno) (Windows):
-
-```powershell
-winget install --id=DenoLand.Deno
-```
-
-### Build and install from source
-
-Complete instructions for building Deno from source can be found in the manual
-[here](https://docs.deno.com/runtime/manual/references/contributing/building_from_source).
 
 ## Your first Deno program
 
