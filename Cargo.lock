@@ -1307,7 +1307,7 @@ dependencies = [
 [[package]]
 name = "deno_ast"
 version = "0.42.1"
-source = "git+https://github.com/unyt-org/deno_ast.git#c82773f5f2aee6e070b16d20a498fde472e54f7a"
+source = "git+https://github.com/unyt-org/deno_ast.git#4f58854f2ddfa96d601e29136ae61e57dc566fca"
 dependencies = [
  "base64 0.21.7",
  "deno_media_type",
