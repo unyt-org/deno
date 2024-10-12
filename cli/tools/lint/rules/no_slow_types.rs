@@ -59,6 +59,7 @@ impl PackageLintRule for NoSlowTypesRule {
             .collect(),
           fixes: vec![],
           custom_docs_url: d.docs_url().map(|u| u.into_owned()),
+          severity: None,
         },
       })
       .collect()
