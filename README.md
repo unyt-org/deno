@@ -33,7 +33,7 @@ installation options can be found
 Shell (Mac, Linux):
 
 ```sh
-curl -fsSL https://unyt.land/install.sh | sh
+curl -fsSL https://unyt.land/install.sh | bash
 ```
 
 PowerShell (Windows):
