@@ -1588,7 +1588,7 @@ dependencies = [
 [[package]]
 name = "deno_ast"
 version = "0.43.3"
-source = "git+https://github.com/unyt-org/deno_ast.git#156007c7ed35f28bded3fcb25bbe200b3bd1fd45"
+source = "git+https://github.com/unyt-org/deno_ast.git#dd02a1cc359e0300ae0b8908fe33f7aa09d9b0ee"
 dependencies = [
  "base64 0.21.7",
  "deno_error",
