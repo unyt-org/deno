@@ -166,6 +166,7 @@ impl LintPluginContainer {
         // TODO(bartlomieju): allow plugins to actually specify custom url for docs
         custom_docs_url: LintDocsUrl::None,
         info: vec![],
+        severity: None,
       },
     };
     self.diagnostics.push(lint_diagnostic);
