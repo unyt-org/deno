@@ -158,9 +158,12 @@ await rebaseRepo("denoland/deno", "deno", latestDenoCommit);
  */
 const denoCargoConfig = Deno.readTextFileSync("deno/Cargo.toml");
 const denoAstVersion =
+  // { version = "x.y.z" }
   /^deno_ast *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(
     denoCargoConfig,
-  )?.[1];
+  )?.[1] ??
+  // = "x.y.z"
+  /^deno_ast *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCargoConfig)?.[1];
 if (!denoAstVersion) {
   throw new Error("Can not get deno_ast version from Cargo.toml");
 }
@@ -177,9 +180,12 @@ await rebaseRepo("denoland/deno_ast", "deno_ast", denoAstCommit);
  */
 const denoCLICargoConfig = Deno.readTextFileSync("deno/cli/Cargo.toml");
 const denoLintVersion =
+  // { version = "x.y.z" }
   /^deno_lint *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(
     denoCLICargoConfig,
-  )?.[1];
+  )?.[1] ??
+  // = "x.y.z"
+  /^deno_lint *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCLICargoConfig)?.[1];
 if (!denoLintVersion) {
   throw new Error("Can not get deno_lint version from Cargo.toml");
 }
