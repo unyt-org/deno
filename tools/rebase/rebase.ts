@@ -178,14 +178,13 @@ await rebaseRepo("denoland/deno_ast", "deno_ast", denoAstCommit);
 /**
  * unyt-org/deno_lint
  */
-const denoCLICargoConfig = Deno.readTextFileSync("deno/cli/Cargo.toml");
 const denoLintVersion =
   // { version = "x.y.z" }
   /^deno_lint *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(
-    denoCLICargoConfig,
+    denoCargoConfig,
   )?.[1] ??
   // = "x.y.z"
-  /^deno_lint *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCLICargoConfig)?.[1];
+  /^deno_lint *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCargoConfig)?.[1];
 if (!denoLintVersion) {
   throw new Error("Can not get deno_lint version from Cargo.toml");
 }
