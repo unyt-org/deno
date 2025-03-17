@@ -1611,6 +1611,7 @@ dependencies = [
 [[package]]
 name = "deno_ast"
 version = "0.46.2"
+source = "git+https://github.com/unyt-org/deno_ast.git#5e19334d4f8b557042ffd7f6006ba1aa6df7b53c"
 dependencies = [
  "base64 0.21.7",
  "deno_error",
@@ -1620,6 +1621,7 @@ dependencies = [
  "once_cell",
  "percent-encoding",
  "serde",
+ "sha256",
  "sourcemap 9.0.0",
  "string_capacity",
  "swc_atoms",
@@ -2172,6 +2174,7 @@ dependencies = [
 [[package]]
 name = "deno_lint"
 version = "0.74.0"
+source = "git+https://github.com/unyt-org/deno_lint.git#78aedb8b409f5f07f39414d842339c7563b30ec7"
 dependencies = [
  "anyhow",
  "deno_ast",
@@ -7398,6 +7401,19 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+]
+
+[[package]]
+name = "sha256"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f880fc8562bdeb709793f00eb42a2ad0e672c4f883bbe59122b926eca935c8f6"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "hex",
+ "sha2",
+ "tokio",
 ]
 
 [[package]]
