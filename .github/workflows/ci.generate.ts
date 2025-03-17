@@ -548,7 +548,6 @@ const ci = {
           if: "matrix.job == 'bench' || matrix.job == 'build'",
           ...installNodeStep,
         },
-        installProtocStep,
         {
           name: "Configure canary build",
           if: [
