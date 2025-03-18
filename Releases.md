@@ -6,6 +6,10 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 2.2.5 / 2025.03.18
+
+- Merge pull request #2 from unyt-org/release_2_3.0
+
 ### 2.2.4 / 2025.03.14
 
 - feat(otel): span context propagators (#28460)

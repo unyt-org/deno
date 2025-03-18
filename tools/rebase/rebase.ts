@@ -162,8 +162,8 @@ const denoAstVersion =
   /^deno_ast *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(
     denoCargoConfig,
   )?.[1] ??
-  // = "x.y.z"
-  /^deno_ast *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCargoConfig)?.[1];
+    // = "x.y.z"
+    /^deno_ast *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCargoConfig)?.[1];
 if (!denoAstVersion) {
   throw new Error("Can not get deno_ast version from Cargo.toml");
 }
@@ -183,8 +183,8 @@ const denoLintVersion =
   /^deno_lint *= *{ *version = *".?((\d+)\.(\d+)\.(\d+))[^"]*"/gm.exec(
     denoCargoConfig,
   )?.[1] ??
-  // = "x.y.z"
-  /^deno_lint *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCargoConfig)?.[1];
+    // = "x.y.z"
+    /^deno_lint *= *".?((\d+)\.(\d+)\.(\d+))"/gm.exec(denoCargoConfig)?.[1];
 if (!denoLintVersion) {
   throw new Error("Can not get deno_lint version from Cargo.toml");
 }
