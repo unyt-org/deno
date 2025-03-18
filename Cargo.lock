@@ -1611,7 +1611,8 @@ dependencies = [
 [[package]]
 name = "deno_ast"
 version = "0.46.2"
-source = "git+https://github.com/unyt-org/deno_ast.git#5e19334d4f8b557042ffd7f6006ba1aa6df7b53c"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5700894f83f8d6a7507ed0667b27b812afbfe9bfdfd4d574191023a9c8c3a11"
 dependencies = [
  "base64 0.21.7",
  "deno_error",
@@ -1621,7 +1622,6 @@ dependencies = [
  "once_cell",
  "percent-encoding",
  "serde",
- "sha256",
  "sourcemap 9.0.0",
  "string_capacity",
  "swc_atoms",
@@ -7404,19 +7404,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sha256"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f880fc8562bdeb709793f00eb42a2ad0e672c4f883bbe59122b926eca935c8f6"
-dependencies = [
- "async-trait",
- "bytes",
- "hex",
- "sha2",
- "tokio",
-]
-
-[[package]]
 name = "sha3"
 version = "0.10.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10148,3 +10135,8 @@ checksum = "16099418600b4d8f028622f73ff6e3deaabdff330fb9a2a131dea781ee8b0768"
 dependencies = [
  "zune-core",
 ]
+
+[[patch.unused]]
+name = "deno_ast"
+version = "0.46.3"
+source = "git+https://github.com/unyt-org/deno_ast.git#f5e7fc285e138de94571f257cd36eb79b11abba5"
