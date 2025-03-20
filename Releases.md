@@ -6,6 +6,10 @@ https://github.com/denoland/deno/releases
 We also have one-line install commands at:
 https://github.com/denoland/deno_install
 
+### 2.2.7 / 2025.03.20
+
+- Merge branch 'release_2_2.6' into main
+
 ### 2.2.6 / 2025.03.19
 
 - Merge pull request #3 from unyt-org/release_2_2.5
